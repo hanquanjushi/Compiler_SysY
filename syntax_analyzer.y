@@ -36,7 +36,7 @@ syntax_tree_node *node(const char *node_name, int children_num, ...);
 }
 
 /* TODO: Your tokens here. */
-%token <node> ADD SUB MUL EXC DIV LT LTE GT GTE EQ NEQ ASSIGN SEMICOLON COMMA LPAREN RPAREN LBRACKET RBRACKET LBRACE RBRACE ELSE IF INT RETURN VOID WHILE FLOAT PER Ident IntConst FloatConst BREAK
+%token <node> ERROR ADD SUB MUL EXC DIV LT LTE GT GTE EQ NEQ ASSIGN SEMICOLON COMMA LPAREN RPAREN LBRACKET RBRACKET LBRACE RBRACE ELSE IF INT RETURN VOID WHILE FLOAT PER Ident IntConst FloatConst BREAK
 %type <node>  CompUnit Decl ConstDecl ComConstDef BType ConstDef ConstInitVal ConstInitValList VarDecl ComVarDef VarDef ConstExplist InitVal InitValList FuncDef FuncType FuncFParams FuncFParam FuncFParamlist Explist BlockItemList ComExp Block BlockItem Stmt Exp Cond LVal PrimaryExp Number UnaryExp UnaryOp FuncRParams MulExp AddExp RelExp EqExp LAndExp LOrExp ConstExp
 
 %start CompUnit
