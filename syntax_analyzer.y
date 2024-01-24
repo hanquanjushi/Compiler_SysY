@@ -30,14 +30,14 @@ syntax_tree_node *node(const char *node_name, int children_num, ...);
 
 /* TODO: Complete this definition.
    Hint: See pass_node(), node(), and syntax_tree.h.
-         Use forward declaring. */
+         Use forward declaring. */ 
 %union {
     syntax_tree_node *node;
 }
 
 /* TODO: Your tokens here. */
-%token <node> ERROR ADD SUB MUL DIV LT LTE GT GTE EQ NEQ ASSIGN SEMICOLON COMMA LPAREN RPAREN LBRACKET RBRACKET LBRACE RBRACE ELSE IF INT RETURN VOID WHILE FLOAT ID INTEGER FLOATPOINT
-%type <node> type-specifier relop addop mulop declaration-list declaration var-declaration fun-declaration local-declarations compound-stmt statement-list statement expression-stmt iteration-stmt selection-stmt return-stmt expression simple-expression var additive-expression term factor INTEGER float call params param-list param args arg-list
+%token <node> ADD SUB MUL EXC DIV LT LTE GT GTE EQ NEQ ASSIGN SEMICOLON COMMA LPAREN RPAREN LBRACKET RBRACKET LBRACE RBRACE ELSE IF INT RETURN VOID WHILE FLOAT PER Ident IntConst FloatConst BREAK
+%type <node>  CompUnit Decl ConstDecl ComConstDef BType ConstDef ConstInitVal ConstInitValList VarDecl ComVarDef VarDef ConstExplist InitVal InitValList FuncDef FuncType FuncFParams FuncFParam FuncFParamlist Explist BlockItemList ComExp Block BlockItem Stmt Exp Cond LVal PrimaryExp Number UnaryExp UnaryOp FuncRParams MulExp AddExp RelExp EqExp LAndExp LOrExp ConstExp
 
 %start CompUnit
 
@@ -74,7 +74,7 @@ Decl: ConstDecl
     $$ = node("Decl",  1, $1);
 }
 
-ConstDecl: CONST BType ConstDef SEMIConstDef SEMICOLON
+ConstDecl: CONST BType ConstDef ComConstDef SEMICOLON
 {
     $$ = node("ConstDecl", 5, $1, $2, $3, $4, $5);
 }
@@ -128,17 +128,17 @@ ConstInitValList: ConstInitVal COMMA ConstInitValList
     $$ = node("ConstInitValList", 1, $1);
 }
 
-VarDecl: BType VarDef SEMIVarDef SEMICOLON
+VarDecl: BType VarDef ComVarDef SEMICOLON
 {
     $$ = node("VarDecl", 4, $1, $2, $3, $4);
 }
-SEMIVarDef: SEMICOLON VarDef SEMIVarDef
+ComVarDef: COMMA VarDef ComVarDef
 {
-    $$ = node("SEMIVarDef", 3, $1, $2, $3);
+    $$ = node("ComVarDef", 3, $1, $2, $3);
 }
 |
 {
-    $$ = node("SEMIVarDef", 0);
+    $$ = node("ComVarDef", 0);
 }
 
 VarDef: Ident ConstExplist
@@ -173,22 +173,22 @@ InitVal: Exp
 }
 
 
-InitValList: InitVal COMMA InitValList
+InitValList: InitVal COMMA InitVal InitValList
 {
-    $$ = node("InitValList", 3, $1, $2, $3);
+    $$ = node("InitValList", 4, $1, $2, $3, $4);
 }
 | InitVal
 {
     $$ = node("InitValList", 1, $1);
 }
 
-FunDef: FuncType Ident LPAREN FuncFParams RPAREN Block
+FuncDef: FuncType Ident LPAREN FuncFParams RPAREN Block
 {
-    $$ = node("FunDef", 6, $1, $2, $3, $4, $5, $6);
+    $$ = node("FuncDef", 6, $1, $2, $3, $4, $5, $6);
 }
 | FuncType Ident LPAREN RPAREN Block
 {
-    $$ = node("FunDef", 5, $1, $2, $3, $4, $5);
+    $$ = node("FuncDef", 5, $1, $2, $3, $4, $5);
 }
 
 FuncType: VOID
@@ -227,9 +227,9 @@ FuncFParam: BType Ident
     $$ = node("FuncFParam", 5, $1, $2, $3, $4, $5);
 }
 
-Explist : Exp  Explist
+Explist : LBRACKET Exp RBRACKET Explist
 {
-    $$ = node("Explist", 2, $1, $2);
+    $$ = node("Explist", 4, $1, $2, $3, $4);
 }
 |
 {
@@ -349,6 +349,10 @@ UnaryExp: PrimaryExp
 {
     $$ = node("UnaryExp",4, $1, $2, $3, $4);
 }
+| Ident LPAREN RPAREN
+{
+    $$ = node("UnaryExp",3, $1, $2, $3);
+}
 | UnaryOp UnaryExp
 {
     $$ = node("UnaryExp",2, $1, $2);
@@ -423,11 +427,11 @@ RelExp: AddExp
 {
     $$ = node("RelExp",3, $1, $2, $3);
 }
-| RelExp LET AddExp
+| RelExp LTE AddExp
 {
     $$ = node("RelExp",3, $1, $2, $3);
 }
-| RelExp GET AddExp
+| RelExp GTE AddExp
 {
     $$ = node("RelExp",3, $1, $2, $3);
 }
