@@ -1,3 +1,4 @@
 git show-ref
 git push origin HEAD:main
 git push origin master:main
+git config --global http.proxy 10.0.2.2:7890
