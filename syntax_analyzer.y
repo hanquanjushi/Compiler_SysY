@@ -59,7 +59,7 @@ CompUnit:  Decl
 {
     gt->root = node("CompUnit", 2, $1, $2);
 }
-| FunDef
+| FuncDef
 {
     gt->root = node("CompUnit", 1, $1);
 }
@@ -404,7 +404,7 @@ MulExp: UnaryExp
 
 AddExp: MulExp
 {
-    $$ = node("AddExp",3, $1, $2, $3);
+    $$ = node("AddExp", 1, $1);
 }
 | AddExp ADD MulExp
 {
