@@ -36,8 +36,8 @@ syntax_tree_node *node(const char *node_name, int children_num, ...);
 }
 
 /* TODO: Your tokens here. */
-%token <node> ERROR ADD SUB MUL EXC DIV LT LTE GT GTE EQ NEQ ASSIGN SEMICOLON COMMA LPAREN RPAREN LBRACKET RBRACKET LBRACE RBRACE ELSE IF INT RETURN VOID WHILE FLOAT PER Ident IntConst FloatConst BREAK OR AND CONST CONTINUE
-%type <node>  CompUnit Decl ConstDecl ComConstDef BType ConstDef ConstInitVal ConstInitValList VarDecl ComVarDef VarDef ConstExplist InitVal InitValList FuncDef FuncType FuncFParams FuncFParam FuncFParamlist Explist BlockItemList ComExp Block BlockItem Stmt Exp Cond LVal PrimaryExp Number UnaryExp UnaryOp FuncRParams MulExp AddExp RelExp EqExp LAndExp LOrExp ConstExp
+%token <node> ERROR ADD SUB MUL EXC DIV LT LTE GT GTE EQ NEQ ASSIGN SEMICOLON COMMA LPAREN RPAREN LBRACKET RBRACKET LBRACE RBRACE ELSE IF INT RETURN VOID WHILE FLOAT PER Ident IntConst FloatConst BREAK CONST CONTINUE OR AND
+%type <node>  CompUnit Decl ConstDecl ComConstDef  ConstDef ConstInitVal ConstInitValList VarDecl ComVarDef VarDef ConstExplist InitVal InitValList FuncDef FuncFParams FuncFParam FuncFParamlist Explist BlockItemList ComExp Block BlockItem Stmt Exp Cond LVal PrimaryExp Number UnaryExp UnaryOp FuncRParams MulExp AddExp RelExp EqExp LAndExp LOrExp ConstExp
 
 %start CompUnit
 
@@ -51,6 +51,10 @@ CompUnit:  Decl
 {
     gt->root = node("CompUnit", 1, $1);
 }
+| FuncDef
+{
+    gt->root = node("CompUnit", 1, $1);
+}
 | CompUnit Decl
 {
     gt->root = node("CompUnit", 2, $1, $2);
@@ -59,10 +63,7 @@ CompUnit:  Decl
 {
     gt->root = node("CompUnit", 2, $1, $2);
 }
-| FuncDef
-{
-    gt->root = node("CompUnit", 1, $1);
-}
+
 
 
 Decl: ConstDecl 
@@ -74,7 +75,11 @@ Decl: ConstDecl
     $$ = node("Decl",  1, $1);
 }
 
-ConstDecl: CONST BType ConstDef ComConstDef SEMICOLON
+ConstDecl: CONST INT ConstDef ComConstDef SEMICOLON
+{
+    $$ = node("ConstDecl", 5, $1, $2, $3, $4, $5);
+}
+| CONST FLOAT ConstDef ComConstDef SEMICOLON
 {
     $$ = node("ConstDecl", 5, $1, $2, $3, $4, $5);
 }
@@ -88,14 +93,7 @@ ComConstDef: COMMA ConstDef ComConstDef
     $$ = node("ComConstDef", 0);
 }
 
-BType: INT
-{
-    $$ = node("BType", 1, $1);
-}
-| FLOAT
-{
-    $$ = node("BType", 1, $1);
-}
+
 
 ConstDef: Ident ASSIGN ConstInitVal
 {
@@ -110,14 +108,15 @@ ConstInitVal: ConstExp
 {
     $$ = node("ConstInitVal", 1, $1);
 }
-|   LBRACE ConstInitValList RBRACE
-{
-    $$ = node("ConstInitVal", 3, $1, $2, $3);
-}
 | LBRACE RBRACE
 {
     $$ = node("ConstInitVal", 2, $1, $2);
 }
+|   LBRACE ConstInitValList RBRACE
+{
+    $$ = node("ConstInitVal", 3, $1, $2, $3);
+}
+
 
 ConstInitValList: ConstInitVal COMMA ConstInitValList
 {
@@ -128,10 +127,16 @@ ConstInitValList: ConstInitVal COMMA ConstInitValList
     $$ = node("ConstInitValList", 1, $1);
 }
 
-VarDecl: BType VarDef ComVarDef SEMICOLON
+VarDecl: INT VarDef ComVarDef SEMICOLON
 {
     $$ = node("VarDecl", 4, $1, $2, $3, $4);
 }
+| FLOAT VarDef ComVarDef SEMICOLON
+{
+    $$ = node("VarDecl", 4, $1, $2, $3, $4);
+}
+
+
 ComVarDef: COMMA VarDef ComVarDef
 {
     $$ = node("ComVarDef", 3, $1, $2, $3);
@@ -150,7 +155,7 @@ VarDef: Ident ConstExplist
     $$ = node("VarDef", 4, $1, $2, $3, $4);
 }
 
-ConstExplist: LBRACKET ConstExp RBRACKET ConstExplist
+ConstExplist:  LBRACKET ConstExp RBRACKET ConstExplist
 {
     $$ = node("ConstExplist", 4, $1, $2, $3, $4);
 }
@@ -173,7 +178,7 @@ InitVal: Exp
 }
 
 
-InitValList: InitVal COMMA InitVal InitValList
+InitValList: InitValList InitVal COMMA InitVal 
 {
     $$ = node("InitValList", 4, $1, $2, $3, $4);
 }
@@ -182,27 +187,31 @@ InitValList: InitVal COMMA InitVal InitValList
     $$ = node("InitValList", 1, $1);
 }
 
-FuncDef: FuncType Ident LPAREN FuncFParams RPAREN Block
-{
-    $$ = node("FuncDef", 6, $1, $2, $3, $4, $5, $6);
-}
-| FuncType Ident LPAREN RPAREN Block
+FuncDef:VOID Ident LPAREN RPAREN Block
 {
     $$ = node("FuncDef", 5, $1, $2, $3, $4, $5);
 }
+| INT Ident LPAREN RPAREN Block
+{
+    $$ = node("FuncDef", 5, $1, $2, $3, $4, $5);
+}
+|  FLOAT Ident LPAREN RPAREN Block
+{
+    $$ = node("FuncDef", 5, $1, $2, $3, $4, $5);
+}
+|  INT Ident LPAREN FuncFParams RPAREN Block
+{
+    $$ = node("FuncDef", 6, $1, $2, $3, $4, $5, $6);
+}
+|  FLOAT Ident LPAREN FuncFParams RPAREN Block
+{
+    $$ = node("FuncDef", 6, $1, $2, $3, $4, $5, $6);
+}
+| VOID Ident LPAREN FuncFParams RPAREN Block
+{
+    $$ = node("FuncDef", 6, $1, $2, $3, $4, $5, $6);
+}
 
-FuncType: VOID
-{
-    $$ = node("FuncType", 1, $1);
-}
-| INT
-{
-    $$ = node("FuncType", 1, $1);
-}
-| FLOAT
-{
-    $$ = node("FuncType", 1, $1);
-}
 
 FuncFParams: FuncFParam FuncFParamlist
 {
@@ -218,11 +227,19 @@ FuncFParamlist: COMMA FuncFParam FuncFParamlist
     $$ = node("FuncFParamlist", 0);
 }
 
-FuncFParam: BType Ident
+FuncFParam: INT Ident
 {
     $$ = node("FuncFParam", 2, $1, $2);
 }
-| BType Ident LBRACKET RBRACKET Explist 
+| FLOAT Ident
+{
+    $$ = node("FuncFParam", 2, $1, $2);
+}
+| INT Ident LBRACKET RBRACKET Explist 
+{
+    $$ = node("FuncFParam", 5, $1, $2, $3, $4, $5);
+}
+| FLOAT Ident LBRACKET RBRACKET Explist 
 {
     $$ = node("FuncFParam", 5, $1, $2, $3, $4, $5);
 }
