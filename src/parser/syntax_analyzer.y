@@ -30,16 +30,16 @@ syntax_tree_node *node(const char *node_name, int children_num, ...);
 
 /* TODO: Complete this definition.
    Hint: See pass_node(), node(), and syntax_tree.h.
-         Use forward declaring. */
+         Use forward declaring. */ 
 %union {
     syntax_tree_node *node;
 }
 
 /* TODO: Your tokens here. */
-%token <node> ERROR ADD SUB MUL DIV LT LTE GT GTE EQ NEQ ASSIGN SEMICOLON COMMA LPAREN RPAREN LBRACKET RBRACKET LBRACE RBRACE ELSE IF INT RETURN VOID WHILE FLOAT ID INTEGER FLOATPOINT
-%type <node> type-specifier relop addop mulop declaration-list declaration var-declaration fun-declaration local-declarations compound-stmt statement-list statement expression-stmt iteration-stmt selection-stmt return-stmt expression simple-expression var additive-expression term factor integer float call params param-list param args arg-list
+%token <node> ERROR ADD SUB MUL EXC DIV LT LTE GT GTE EQ NEQ ASSIGN SEMICOLON COMMA LPAREN RPAREN LBRACKET RBRACKET LBRACE RBRACE ELSE IF INT RETURN VOID WHILE FLOAT PER Ident IntConst FloatConst BREAK CONST CONTINUE OR AND
+%type <node>  CompUnit Decl ConstDecl ComConstDef  ConstDef ConstInitVal ConstInitValList VarDecl ComVarDef VarDef ConstExplist InitVal InitValList FuncDef FuncFParams FuncFParam FuncFParamlist Explist BlockItemList ComExp Block BlockItem Stmt Exp Cond LVal PrimaryExp Number UnaryExp UnaryOp FuncRParams MulExp AddExp RelExp EqExp LAndExp LOrExp ConstExp
 
-%start program
+%start CompUnit
 
 %%
 /* TODO: Your rules here. */
@@ -47,301 +47,458 @@ syntax_tree_node *node(const char *node_name, int children_num, ...);
 /* Example:
 
 */
-program: declaration-list 
+CompUnit:  Decl
 {
-    gt->root = node("program", 1, $1); 
+    gt->root = node("CompUnit", 1, $1);
 }
-
-declaration-list: declaration-list declaration
+| FuncDef
 {
-$$ = node("declaration-list", 2, $1, $2);
+    gt->root = node("CompUnit", 1, $1);
 }
-| declaration
+| CompUnit Decl
 {
-$$ = node("declaration-list", 1, $1);
+    gt->root = node("CompUnit", 2, $1, $2);
 }
-
-declaration: var-declaration
+| CompUnit FuncDef
 {
-$$ = node("declaration", 1, $1);
-}
-| fun-declaration
-{
-$$ = node("declaration", 1, $1);
-}
-
-var-declaration: type-specifier ID SEMICOLON
-{
-$$ = node("var-declaration", 3, $1, $2, $3);
-}
-| type-specifier ID LBRACKET INTEGER RBRACKET SEMICOLON
-{
-$$ = node("var-declaration", 6, $1, $2, $3, $4, $5, $6);
-}
-
-type-specifier: INT
-{
-$$ = node("type-specifier", 1, $1);
-}
-| FLOAT
-{
-$$ = node("type-specifier", 1, $1);
-}
-| VOID
-{
-$$ = node("type-specifier", 1, $1);
-}
-
-fun-declaration: type-specifier ID LPAREN params RPAREN compound-stmt
-{
-$$ = node("fun-declaration", 6, $1, $2, $3, $4, $5, $6);
-}
-
-params: param-list
-{
-$$ = node("params", 1, $1);
-}
-| VOID
-{
-$$ = node("params", 1, $1);
-}
-
-param-list: param-list COMMA param
-{
-$$ = node("param-list", 3, $1, $2, $3);
-}
-| param
-{
-$$ = node("param-list", 1, $1);
-}
-
-param: type-specifier ID
-{
-$$ = node("param", 2, $1, $2);
-}
-| type-specifier ID LBRACKET RBRACKET
-{
-$$ = node("param", 4, $1, $2, $3, $4);
-}
-
-compound-stmt: LBRACE local-declarations statement-list RBRACE
-{
-$$ = node("compound-stmt", 4, $1, $2, $3, $4);
-}
-
-local-declarations: local-declarations var-declaration
-{
-$$ = node("local-declarations", 2, $1, $2);
-}
-|
-{
-$$ = node("local-declarations", 0);
-}
-
-statement-list: statement-list statement
-{
-$$ = node("statement-list", 2, $1, $2);
-}
-|
-{
-$$ = node("statement-list", 0);
+    gt->root = node("CompUnit", 2, $1, $2);
 }
 
 
-statement: expression-stmt
+
+Decl: ConstDecl 
 {
-$$ = node("statement", 1, $1);
+    $$ = node("Decl", 1, $1);
 }
-| compound-stmt
+| VarDecl
 {
-$$ = node("statement", 1, $1);
+    $$ = node("Decl",  1, $1);
 }
 
-statement: selection-stmt
+ConstDecl: CONST INT ConstDef ComConstDef SEMICOLON
 {
-$$ = node("statement", 1, $1);
+    $$ = node("ConstDecl", 5, $1, $2, $3, $4, $5);
 }
-| iteration-stmt
+| CONST FLOAT ConstDef ComConstDef SEMICOLON
 {
-$$ = node("statement", 1, $1);
-}
-| return-stmt
-{
-$$ = node("statement", 1, $1);
+    $$ = node("ConstDecl", 5, $1, $2, $3, $4, $5);
 }
 
-expression-stmt: expression SEMICOLON
+ComConstDef: COMMA ConstDef ComConstDef
 {
-$$ = node("expression-stmt", 2, $1, $2);
-}
-| SEMICOLON
-{
-$$ = node("expression-stmt", 1, $1);
-}
-
-selection-stmt: IF LPAREN expression RPAREN statement
-{
-$$ = node("selection-stmt", 5, $1, $2, $3, $4, $5);
-}
-| IF LPAREN expression RPAREN statement ELSE statement
-{
-$$ = node("selection-stmt", 7, $1, $2, $3, $4, $5, $6, $7);
-}
-
-iteration-stmt: WHILE LPAREN expression RPAREN statement
-{
-$$ = node("iteration-stmt", 5, $1, $2, $3, $4, $5);
-}
-
-return-stmt: RETURN SEMICOLON
-{
-$$ = node("return-stmt", 2, $1, $2);
-}
-| RETURN expression SEMICOLON
-{
-$$ = node("return-stmt", 3, $1, $2, $3);
-}
-
-expression: var ASSIGN expression
-{
-$$ = node("expression", 3, $1, $2, $3);
-}
-| simple-expression
-{
-$$ = node("expression", 1, $1);
-}
-
-var: ID
-{
-$$ = node("var", 1, $1);
-}
-| ID LBRACKET expression RBRACKET
-{
-$$ = node("var", 4, $1, $2, $3, $4);
-}
-
-simple-expression: additive-expression relop additive-expression
-{
-$$ = node("simple-expression", 3, $1, $2, $3);
-}
-| additive-expression
-{
-$$ = node("simple-expression", 1, $1);
-}
-
-relop: LTE
-{
-$$ = node("relop", 1, $1);
-}
-| LT
-{
-$$ = node("relop", 1, $1);
-}
-| GT
-{
-$$ = node("relop", 1, $1);
-}
-| GTE
-{
-$$ = node("relop", 1, $1);
-}
-| EQ
-{
-$$ = node("relop", 1, $1);
-}
-| NEQ
-{
-$$ = node("relop", 1, $1);
-}
-
-additive-expression: additive-expression addop term
-{
-$$ = node("additive-expression", 3, $1, $2, $3);
-}
-| term
-{
-$$ = node("additive-expression", 1, $1);
-}
-
-addop: ADD
-{
-$$ = node("addop", 1, $1);
-}
-| SUB
-{
-$$ = node("addop", 1, $1);
-}
-
-term: term mulop factor
-{
-$$ = node("term", 3, $1, $2, $3);
-}
-| factor
-{
-$$ = node("term", 1, $1);
-}
-
-mulop: MUL
-{
-$$ = node("mulop", 1, $1);
-}
-| DIV
-{
-$$ = node("mulop", 1, $1);
-}
-
-factor: LPAREN expression RPAREN
-{
-$$ = node("factor", 3, $1, $2, $3);
-}
-| var
-{
-$$ = node("factor", 1, $1);
-}
-| call
-{
-$$ = node("factor", 1, $1);
-}
-| integer
-{
-$$ = node("factor", 1, $1);
-}
-| float
-{
-$$ = node("factor", 1, $1);
-}
-
-integer: INTEGER
-{
-$$ = node("integer", 1, $1);
-}
-
-float: FLOATPOINT
-{
-$$ = node("float", 1, $1);
-}
-
-call: ID LPAREN args RPAREN
-{
-$$ = node("call", 4, $1, $2, $3, $4);
-}
-
-args: arg-list
-{
-$$ = node("args", 1, $1);
+    $$ = node("ComConstDef", 3, $1, $2, $3);
 }
 | 
 {
-$$ = node("args", 0);
+    $$ = node("ComConstDef", 0);
 }
 
-arg-list: arg-list COMMA expression
+
+
+ConstDef: Ident ASSIGN ConstInitVal
 {
-$$ = node("arg-list", 3, $1, $2, $3);
+    $$ = node("ConstDef", 3, $1, $2, $3);
 }
-| expression
+|Ident ConstExplist ASSIGN ConstInitVal
 {
-$$ = node("arg-list", 1, $1);
+    $$ = node("ConstDef",  4, $1, $2, $3, $4);
+}
+
+ConstInitVal: ConstExp
+{
+    $$ = node("ConstInitVal", 1, $1);
+}
+| LBRACE RBRACE
+{
+    $$ = node("ConstInitVal", 2, $1, $2);
+}
+|   LBRACE ConstInitValList RBRACE
+{
+    $$ = node("ConstInitVal", 3, $1, $2, $3);
+}
+
+
+ConstInitValList: ConstInitVal COMMA ConstInitValList
+{
+    $$ = node("ConstInitValList", 3, $1, $2, $3);
+}
+| ConstInitVal
+{
+    $$ = node("ConstInitValList", 1, $1);
+}
+
+VarDecl: INT VarDef ComVarDef SEMICOLON
+{
+    $$ = node("VarDecl", 4, $1, $2, $3, $4);
+}
+| FLOAT VarDef ComVarDef SEMICOLON
+{
+    $$ = node("VarDecl", 4, $1, $2, $3, $4);
+}
+
+
+ComVarDef: COMMA VarDef ComVarDef
+{
+    $$ = node("ComVarDef", 3, $1, $2, $3);
+}
+|
+{
+    $$ = node("ComVarDef", 0);
+}
+
+VarDef: Ident ConstExplist
+{
+    $$ = node("VarDef", 2, $1, $2);
+}
+| Ident ConstExplist ASSIGN InitVal
+{
+    $$ = node("VarDef", 4, $1, $2, $3, $4);
+}
+| Ident
+{
+    $$ = node("VarDef", 1, $1);
+}
+| Ident ASSIGN InitVal
+{
+    $$ = node("VarDef", 3, $1, $2, $3);
+}
+
+ConstExplist:  LBRACKET ConstExp RBRACKET ConstExplist
+{
+    $$ = node("ConstExplist", 4, $1, $2, $3, $4);
+}
+| LBRACKET ConstExp RBRACKET
+{
+    $$ = node("ConstExplist",  3, $1, $2, $3);
+}
+
+InitVal: Exp
+{
+    $$ = node("InitVal", 1, $1);
+}
+| LBRACE InitVal InitValList RBRACE
+{
+    $$ = node("InitVal",  4, $1, $2, $3, $4);
+}
+| LBRACE InitVal RBRACE
+{
+    $$ = node("InitVal",  3, $1, $2, $3);
+}
+| LBRACE RBRACE
+{
+    $$ = node("InitVal", 2, $1, $2);
+}
+
+
+InitValList: InitValList  COMMA InitVal 
+{
+    $$ = node("InitValList", 3, $1, $2, $3);
+}
+| COMMA InitVal
+{
+    $$ = node("InitValList", 2, $1, $2);
+}
+
+FuncDef:VOID Ident LPAREN RPAREN Block
+{
+    $$ = node("FuncDef", 5, $1, $2, $3, $4, $5);
+}
+| INT Ident LPAREN RPAREN Block
+{
+    $$ = node("FuncDef", 5, $1, $2, $3, $4, $5);
+}
+|  FLOAT Ident LPAREN RPAREN Block
+{
+    $$ = node("FuncDef", 5, $1, $2, $3, $4, $5);
+}
+|  INT Ident LPAREN FuncFParams RPAREN Block
+{
+    $$ = node("FuncDef", 6, $1, $2, $3, $4, $5, $6);
+}
+|  FLOAT Ident LPAREN FuncFParams RPAREN Block
+{
+    $$ = node("FuncDef", 6, $1, $2, $3, $4, $5, $6);
+}
+| VOID Ident LPAREN FuncFParams RPAREN Block
+{
+    $$ = node("FuncDef", 6, $1, $2, $3, $4, $5, $6);
+}
+
+
+FuncFParams: FuncFParam FuncFParamlist
+{
+    $$ = node("FuncFParams", 2, $1, $2);
+}
+
+FuncFParamlist: COMMA FuncFParam FuncFParamlist
+{
+    $$ = node("FuncFParamlist", 3, $1, $2, $3);
+}
+|
+{
+    $$ = node("FuncFParamlist", 0);
+}
+
+FuncFParam: INT Ident
+{
+    $$ = node("FuncFParam", 2, $1, $2);
+}
+| FLOAT Ident
+{
+    $$ = node("FuncFParam", 2, $1, $2);
+}
+| INT Ident LBRACKET RBRACKET Explist 
+{
+    $$ = node("FuncFParam", 5, $1, $2, $3, $4, $5);
+}
+| FLOAT Ident LBRACKET RBRACKET Explist 
+{
+    $$ = node("FuncFParam", 5, $1, $2, $3, $4, $5);
+}
+
+Explist : LBRACKET Exp RBRACKET Explist
+{
+    $$ = node("Explist", 4, $1, $2, $3, $4);
+}
+|
+{
+    $$ = node("Explist", 0);
+}
+
+Block: LBRACE BlockItemList RBRACE
+{
+    $$ = node("Block", 3, $1, $2, $3);
+}
+
+BlockItemList: BlockItem BlockItemList
+{
+    $$ = node("BlockItemList", 2, $1, $2);
+}
+|
+{
+    $$ = node("BlockItemList", 0);
+}
+
+BlockItem: Decl
+{
+    $$ = node("BlockItem", 1, $1);
+}
+| Stmt
+{
+    $$ = node("BlockItem", 1, $1);
+}
+
+Stmt: LVal ASSIGN Exp SEMICOLON
+{
+    $$ = node("Stmt", 4, $1, $2, $3, $4);
+}
+| Exp SEMICOLON
+{
+    $$ = node("Stmt", 2, $1, $2);
+}
+| SEMICOLON
+{
+    $$ = node("Stmt", 1, $1);
+}
+| Block
+{
+    $$ = node("Stmt", 1, $1);
+}
+| IF LPAREN Cond RPAREN Stmt
+{
+    $$ = node("Stmt", 5, $1, $2, $3, $4, $5);
+}
+| IF LPAREN Cond RPAREN Stmt ELSE Stmt
+{
+    $$ = node("Stmt", 7, $1, $2, $3, $4, $5, $6, $7);
+}
+| WHILE LPAREN Cond RPAREN Stmt
+{
+    $$ = node("Stmt", 5, $1, $2, $3, $4, $5);
+}
+| BREAK SEMICOLON
+{
+    $$ = node("Stmt", 2, $1, $2);
+}
+| CONTINUE SEMICOLON
+{
+    $$ = node("Stmt", 2, $1, $2);
+}
+| RETURN SEMICOLON
+{
+    $$ = node("Stmt", 2, $1, $2);
+}
+| RETURN Exp SEMICOLON
+{
+    $$ = node("Stmt", 3, $1, $2, $3);
+}
+
+Exp: AddExp
+{
+    $$ = node("Exp", 1, $1);
+}
+
+Cond : LOrExp
+{
+    $$ = node("Cond", 1, $1);
+}
+
+LVal : Ident Explist
+{
+    $$ = node("LVal", 2, $1, $2);
+}
+
+PrimaryExp: LPAREN Exp RPAREN
+{
+    $$ = node("PrimaryExp", 3, $1, $2, $3);
+}
+| LVal
+{
+    $$ = node("PrimaryExp", 1, $1);
+}
+| Number
+{
+    $$ = node("PrimaryExp", 1, $1);
+}
+
+Number: IntConst
+{
+    $$ = node("Number", 1, $1);
+}
+| FloatConst
+{
+    $$ = node("Number", 1, $1);
+}
+
+UnaryExp: PrimaryExp
+{
+    $$ = node("UnaryExp",1, $1);
+}
+| Ident LPAREN FuncRParams RPAREN
+{
+    $$ = node("UnaryExp",4, $1, $2, $3, $4);
+}
+| Ident LPAREN RPAREN
+{
+    $$ = node("UnaryExp",3, $1, $2, $3);
+}
+| UnaryOp UnaryExp
+{
+    $$ = node("UnaryExp",2, $1, $2);
+}
+
+UnaryOp: ADD
+{
+    $$ = node("UnaryOp",1, $1);
+}
+| SUB
+{
+    $$ = node("UnaryOp",1, $1);
+}
+| EXC
+{
+    $$ = node("UnaryOp",1, $1);
+}
+
+ComExp : COMMA Exp ComExp
+{
+    $$ = node("ComExp",3, $1, $2, $3);
+}
+|
+{
+    $$ = node("ComExp",0);
+}
+
+FuncRParams : Exp ComExp
+{
+    $$ = node("FuncRParams",2, $1, $2);
+}
+
+MulExp: UnaryExp
+{
+    $$ = node("MulExp",1, $1);
+}
+| MulExp MUL UnaryExp
+{
+    $$ = node("MulExp",3, $1, $2, $3);
+}
+| MulExp DIV UnaryExp
+{
+    $$ = node("MulExp",3, $1, $2, $3);
+}
+| MulExp PER UnaryExp
+{
+    $$ = node("MulExp",3, $1, $2, $3);
+}
+
+AddExp: MulExp
+{
+    $$ = node("AddExp", 1, $1);
+}
+| AddExp ADD MulExp
+{
+    $$ = node("AddExp",3, $1, $2, $3);
+}
+| AddExp SUB MulExp
+{
+    $$ = node("AddExp",3, $1, $2, $3);
+}
+
+RelExp: AddExp
+{
+    $$ = node("RelExp",1, $1);
+}
+| RelExp LT AddExp
+{
+    $$ = node("RelExp",3, $1, $2, $3);
+}
+| RelExp GT AddExp
+{
+    $$ = node("RelExp",3, $1, $2, $3);
+}
+| RelExp LTE AddExp
+{
+    $$ = node("RelExp",3, $1, $2, $3);
+}
+| RelExp GTE AddExp
+{
+    $$ = node("RelExp",3, $1, $2, $3);
+}
+
+EqExp: RelExp
+{
+    $$ = node("EqExp",1, $1);
+}
+|EqExp EQ RelExp
+{
+    $$ = node("EqExp",3, $1, $2, $3);   
+}
+|EqExp NEQ RelExp
+{
+    $$ = node("EqExp",3, $1, $2, $3);
+}
+
+LAndExp:  EqExp
+{
+    $$ = node("LAndExp",1, $1);
+}
+| LAndExp AND EqExp
+{
+    $$ = node("LAndExp",3, $1, $2, $3); 
+}
+
+LOrExp:  LAndExp
+{
+    $$ = node("LOrExp",1, $1);
+}
+| LOrExp OR LAndExp
+{
+    $$ = node("LOrExp",3, $1, $2, $3); 
+}
+
+ConstExp: AddExp
+{
+    $$ = node("ConstExp",1, $1);
 }
 %%
 
