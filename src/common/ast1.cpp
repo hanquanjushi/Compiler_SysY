@@ -161,5 +161,142 @@ ASTNode *AST::transform_node_iter(syntax_tree_node *n)
         }       
         return node;
     }
-    else if(_STR_EQ(n->name,"ConstInitval"))
+    else if(_STR_EQ(n->name,"ConstInitval"))//写的不好,打算重写，这里单纯递归不太行
+    {
+        if(n->children_num == 1)
+        return transform_node_iter(n->children[0]);
+        else if(n->children_num == 2)
+        //return 
+        else if (n->children_num == 3)
+        {            
+            return  transform_node_iter(n->children[1]);            
+        }
+    }
+    else if(_STR_EQ(n->name, "ConstInitValList"))
+    {
+        if (n->children_num == 3)
+        {
+            auto node = ASTConstInitValList();
+            auto val = transform_node_iter(n->children[0]);
+            auto rest = transform_node_iter(n->children[2]);
+           
+        } 
+
+        else if (n->children_num == 1)
+            return transform_node_iter(n->children[0]);
+    }
+    else if(_STR_EQ(n->name,"Initval"))//写的不好,打算重写，这里单纯递归不太行,要结合hpp文件
+    {
+        if(n->children_num == 1)
+        return transform_node_iter(n->children[0]);
+        else if(n->children_num == 2)
+        //return 
+        else if (n->children_num == 3)
+        {            
+            return  transform_node_iter(n->children[1]);            
+        }
+    }
+    else if(_STR_EQ(n->name, "InitValList"))
+    {
+        if (n->children_num == 3)
+        {
+            auto node = ASTInitValList();
+            auto val = transform_node_iter(n->children[0]);
+            auto rest = transform_node_iter(n->children[2]);
+           
+        } 
+
+        else if (n->children_num == 1)
+            return transform_node_iter(n->children[0]);
+    }
+    else if (_STR_EQ(n->name, "FuncDef"))
+    {
+        auto node = new ASTFuncDef();
+        if (_STR_EQ(n->children[0]->name, "INT")) {
+            node->type = TYPE_INT;
+        } else if (_STR_EQ(n->children[0]->name, "FLOAT")) {
+            node->type = TYPE_FLOAT;
+        } else {
+            node->type = TYPE_VOID;
+        }
+            node->id = n-> children[1]->name;
+            std::queue<syntax_tree_node *> q;
+            auto list_ptr = n->children[3];
+            q.push(list_ptr->children[0]);
+            if (list_ptr->children_num == 3) {
+                while (list_ptr->children_num == 3) {
+                    q.push(list_ptr->children[1]);
+                    list_ptr = list_ptr->children[2];
+                }
+            }
+            while(!q.empty())
+        {
+            auto child_node = static_cast<ASTFuncFParam *>(transform_node_iter(q.front()));//“先进”
+            auto child_node_shared =std::shared_ptr<ASTFuncFParam>(child_node);
+            node->FuncFParamtable.push_back(child_node_shared);
+            q.pop();
+        }       
+        return node;
+    }
+    else if (_STR_EQ(n->name, "FuncFParam"))
+    {
+        auto node = new ASTFuncFParam();
+        if (_STR_EQ(n->children[0]->name, "INT")) {
+            node->type = TYPE_INT;
+        } else if (_STR_EQ(n->children[0]->name, "FLOAT")) {
+            node->type = TYPE_FLOAT;
+        } else {
+            node->type = TYPE_VOID;
+        }
+            node->id = n-> children[1]->name;
+        if(n->children_num == 5)
+        {
+            std::queue<syntax_tree_node *> q;
+            auto list_ptr = n->children[4];
+            if (list_ptr->children_num == 4) {
+                while (list_ptr->children_num == 4) {
+                    q.push(list_ptr->children[1]);
+                    list_ptr = list_ptr->children[3];
+                }
+            }
+            while(!q.empty())//是否要传达数组这一消息？有疑问
+            {
+                auto child_node = static_cast<ASTAddExp *>(transform_node_iter(q.front()->children[0]));//“先进”
+                auto child_node_shared =std::shared_ptr<ASTAddExp>(child_node);
+                node->AddExptable.push_back(child_node_shared);
+                q.pop();
+            }       
+
+        }        
+    }
+    else if(_STR_EQ(n->name,"Block"))
+    {
+        auto->node = ASTBlock();
+        auto list_ptr= n->children[1];
+        std::queue<syntax_tree_node *> q;
+        if (list_ptr->children_num == 2) {
+                while (list_ptr->children_num == 2) {
+                    q.push(list_ptr->children[0]);
+                    list_ptr = list_ptr->children[1];
+            }
+        }
+        while(!q.empty())
+            {
+                if(_STR_EQ(q.top()->children[0]->name,"Decl"))
+                {
+                    auto child_node = static_cast<ASTDecl *>(transform_node_iter(q.front()->children[0]));//“先进”
+                    auto child_node_shared =std::shared_ptr<ASTDecl>(child_node);
+                    node->Decltable.push_back(child_node_shared);
+                }
+                if(_STR_EQ(q.top()->children[0]->name,"Stmt"))
+                {
+                    auto child_node = static_cast<ASTStmt *>(transform_node_iter(q.front()->children[0]));//“先进”
+                    auto child_node_shared =std::shared_ptr<ASTStmt>(child_node);
+                    node->Stmttable.push_back(child_node_shared);
+                }
+                q.pop();
+            }       
+        
+    }
 }
+Value* ASTCompUnit::accept(ASTVisitor &visitor) { return visitor.visit(*this); }// 等等
