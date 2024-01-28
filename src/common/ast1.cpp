@@ -176,7 +176,7 @@ ASTNode *AST::transform_node_iter(syntax_tree_node *n)
     {
         if (n->children_num == 3)
         {
-            auto node = ASTConstInitValList();
+            auto node = new ASTConstInitValList();
             auto val = transform_node_iter(n->children[0]);
             auto rest = transform_node_iter(n->children[2]);
            
@@ -190,7 +190,7 @@ ASTNode *AST::transform_node_iter(syntax_tree_node *n)
         if(n->children_num == 1)
         return transform_node_iter(n->children[0]);
         else if(n->children_num == 2)
-        //return 
+        return new ASTInitVal();//新创建
         else if (n->children_num == 3)
         {            
             return  transform_node_iter(n->children[1]);            
@@ -200,7 +200,7 @@ ASTNode *AST::transform_node_iter(syntax_tree_node *n)
     {
         if (n->children_num == 3)
         {
-            auto node = ASTInitValList();
+            auto node = new ASTInitValList();
             auto val = transform_node_iter(n->children[0]);
             auto rest = transform_node_iter(n->children[2]);
            
@@ -297,6 +297,10 @@ ASTNode *AST::transform_node_iter(syntax_tree_node *n)
                 q.pop();
             }       
         
+    }
+    else if(_STR_EQ(n->name,"Stmt"))
+    {
+
     }
 }
 Value* ASTCompUnit::accept(ASTVisitor &visitor) { return visitor.visit(*this); }// 等等
