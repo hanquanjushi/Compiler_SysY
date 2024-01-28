@@ -1,0 +1,165 @@
+#include "ast.hpp"
+
+#include <cstring>
+#include <iostream>
+#include <stack>
+
+#define _AST_NODE_ERROR_                                                       \
+    std::cerr << "Abort due to node cast error."                               \
+                 "Contact with TAs to solve your problem."                     \
+              << std::endl;                                                    \
+    std::abort();
+#define _STR_EQ(a, b) (strcmp((a), (b)) == 0)
+
+void AST::run_visitor(ASTVisitor &visitor) { root->accept(visitor); }
+AST::AST(syntax_tree *s) {
+    if (s == nullptr) {
+        std::cerr << "empty input tree!" << std::endl;
+        std::abort();
+    }
+    auto node = transform_node_iter(s->root);
+    del_syntax_tree(s);
+    root = std::shared_ptr<ASTCompUnit>(static_cast<ASTCompUnit *>(node));
+}
+ASTNode *AST::transform_node_iter(syntax_tree_node *n)
+{
+    if(_STR_EQ(n->name,"CompUnit"))//这里分为两组, 按照syntax_analyzer.y的定义，将Decl(FuncDef)和CompUnit Decl进行栈上操作
+    {
+        //return transform_node_iter(n->children[0]);//Decl
+        auto node = new ASTCompUnit();
+        std::stack<syntax_tree_node *> s;//Decl栈
+        auto list_ptr = n;
+        if(list_ptr->children_num == 2)//---->children
+        {
+            s.push(list_ptr->children[1]);//Decl(FuncDef)
+            list_ptr=list_ptr->children[0];
+        }
+        s.push(list_ptr->children[0]);//Decl(FuncDef)
+        while (!s.empty()) {
+            if(_STR_EQ(s.top()->name,"Decl"))// 有两种可能的属性：Decl,FuncDef  
+            {
+                auto child_node = static_cast<ASTDecl *>(transform_node_iter(s.top()));
+                auto child_node_shared =std::shared_ptr<ASTDecl>(child_node);
+                node->decl.push_back(child_node_shared);//CompUnit有个成员变量，存声明：名字可修改
+            }
+            else if(_STR_EQ(s.top()->name,"FuncDef"))
+            {
+                auto child_node = static_cast<ASTFuncDef *>(transform_node_iter(s.top()));
+                auto child_node_shared =std::shared_ptr<ASTFuncDef>(child_node);
+                node->Funcdecl.push_back(child_node_shared);//另一个成员变量
+            }
+            s.pop();
+        }
+        return node;
+    }
+    else if(_STR_EQ(n->name,"Decl"))
+    {
+        return transform_node_iter(n->children[0]);//ConstDecl or VarDecl
+    }
+    else if(_STR_EQ(n->name,"ConstDecl"))
+    {
+        auto node = new ASTConstDecl();//声明一下这个-->e.g. CONST INT num_a[100]=10,num_b[50]=9;)
+        if(_STR_EQ(n-> children[1]-> name,"INT"))//num_a,num_b即IDENT
+        node->type = TYPE_CONSTINT;//BTYPE分为INT，FLOAT(const类型):怎么处理const?是否定义CONSTINT,CONSTFLOAT?
+        else node->type = TYPE_CONSTFLOAT;//建议可以定义一下
+        std::queue<syntax_tree_node *> q;//ConstDef队列
+        q.push(n->children[2]);//存ConstDef:再声明下ASTConstDef:shared_ptr
+        auto list_ptr = n->children[3];//ComConstDef
+        while (list_ptr->children_num == 3) {//COMMA ConstDef ComConstDef
+            q.push(list_ptr->children[1]);
+            list_ptr = list_ptr->children[2];//ComConstDef
+        }
+        //建立一个ConstSymtable成员变量,进行存储ConstDef形式的push_back
+        while(!q.empty())
+        {
+            auto child_node = static_cast<ASTConstDef *>(transform_node_iter(q.front()));//“先进”
+            auto child_node_shared =std::shared_ptr<ASTConstDef>(child_node);
+            node->ConstSymtable.push_back(child_node_shared);
+            q.pop();
+        }       
+        return node;
+    }
+    else if(_STR_EQ(n->name,"ConstDef"))//ConstDef → Ident { '[' ConstExp ']' } '=' ConstInitVal.问题是ConstDef的Type是否要指定。
+    {
+        auto node = new ASTConstDef();//
+        node->id = n-> children[0]-> name;//IDENT
+        if(n->children_num == 3) //constExp不存在
+        node->Constinit_val = n->children[2]->name;
+        else if(n->children_num == 4)
+        {
+            node->Constinit_val = n-> children[3]-> name;
+            auto list_ptr = n-> children[1];//ConstExpList，在这里利用队列直接存数组了
+            std::queue<syntax_tree_node *> q;//ConstDef队列
+            while (list_ptr->children_num == 4) {//LBRACKET ConstExp RBRACKET ConstExplist
+            q.push(list_ptr->children[1]);
+            list_ptr = list_ptr->children[3];//ConstInitValList
+            }
+            //剩下的就是list_ptr->children_num==3
+            q.push(list_ptr->children[1]);    
+            //建立一个ConstExpSymtable成员变量,进行存储ConstExp形式的push_back
+            while(!q.empty())
+            {
+                auto child_node = static_cast<ASTConstExp *>(transform_node_iter(q.front()));//“先进”
+                auto child_node_shared =std::shared_ptr<ASTConstExp>(child_node);
+                node->ConstExpSymtable.push_back(child_node_shared);
+                q.pop();           
+            }
+        }
+        return node;
+    }
+    else if(_STR_EQ(n->name,"VarDef"))//
+    {
+        auto node = new ASTVarDef();//
+        node->id = n-> children[0]-> name;//IDENT
+        if(n->children_num == 3) //constExp不存在
+        node->init_val = n->children[2]->name;
+        else if(n->children_num == 4||n->children_num == 2)//Ident ConstExplist
+        {
+            if(n->children_num == 4)
+            {
+                node->init_val = n-> children[3]-> name;
+            }
+            auto list_ptr = n-> children[1];//ConstExpList，在这里利用队列直接存数组了
+            std::queue<syntax_tree_node *> q;//ConstDef队列
+            while (list_ptr->children_num == 4){//LBRACKET ConstExp RBRACKET ConstExplist
+            q.push(list_ptr->children[1]);
+            list_ptr = list_ptr->children[3];//ConstInitValList
+             }
+            //剩下的就是children_num==3
+            q.push(list_ptr->children[1]);    
+            //建立一个ConstExpSymtable成员变量,进行存储ConstExp形式的push_back
+            while(!q.empty())
+            {
+                auto child_node = static_cast<ASTConstExp *>(transform_node_iter(q.front()));//“先进”
+                auto child_node_shared =std::shared_ptr<ASTConstExp>(child_node);
+                node->ConstSymtable.push_back(child_node_shared);
+                q.pop();           
+            }
+        }
+        return node;
+    }
+    else if(_STR_EQ(n->name,"VarDecl"))
+    {
+        auto node = new ASTVarDecl();//声明一下这个-->e.g. INT num_a[100]=10,num_b[50]=9;)
+        if(_STR_EQ(n-> children[0]-> name,"INT"))//num_a,num_b即IDENT
+            node->type = TYPE_INT;//BTYPE分为INT，FLOAT
+        else node->type = TYPE_FLOAT;
+        std::queue<syntax_tree_node *> q;//VarDef队列
+        q.push(n->children[1]);//存VarDef:再声明下ASTVarDef
+        auto list_ptr = n->children[2];//ComVarDef
+        while (list_ptr->children_num == 3) {//COMMA VarDef ComVarDef
+            q.push(list_ptr->children[1]);
+            list_ptr = list_ptr->children[2];//ComVarDef
+        }
+        //建立一个VarSymtable成员变量,进行存储VarDef形式的push_back
+        while(!q.empty())
+        {
+            auto child_node = static_cast<ASTVarDef *>(transform_node_iter(q.front()));//“先进”
+            auto child_node_shared =std::shared_ptr<ASTVarDef>(child_node);
+            node->VarSymtable.push_back(child_node_shared);
+            q.pop();
+        }       
+        return node;
+    }
+    else if(_STR_EQ(n->name,"ConstInitval"))
+}
