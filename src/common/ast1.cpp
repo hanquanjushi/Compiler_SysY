@@ -3,7 +3,7 @@
 #include <cstring>
 #include <iostream>
 #include <stack>
-
+#include <queue>
 #define _AST_NODE_ERROR_                                                       \
     std::cerr << "Abort due to node cast error."                               \
                  "Contact with TAs to solve your problem."                     \
@@ -40,13 +40,13 @@ ASTNode *AST::transform_node_iter(syntax_tree_node *n)
             {
                 auto child_node = static_cast<ASTDecl *>(transform_node_iter(s.top()));
                 auto child_node_shared =std::shared_ptr<ASTDecl>(child_node);
-                node->decl.push_back(child_node_shared);//CompUnit有个成员变量，存声明：名字可修改
+                node->decls.push_back(child_node_shared);//CompUnit有个成员变量，存声明：名字可修改
             }
             else if(_STR_EQ(s.top()->name,"FuncDef"))
             {
                 auto child_node = static_cast<ASTFuncDef *>(transform_node_iter(s.top()));
                 auto child_node_shared =std::shared_ptr<ASTFuncDef>(child_node);
-                node->Funcdecl.push_back(child_node_shared);//另一个成员变量
+                node->func_defs.push_back(child_node_shared);//另一个成员变量
             }
             s.pop();
         }
@@ -74,7 +74,7 @@ ASTNode *AST::transform_node_iter(syntax_tree_node *n)
         {
             auto child_node = static_cast<ASTConstDef *>(transform_node_iter(q.front()));//“先进”
             auto child_node_shared =std::shared_ptr<ASTConstDef>(child_node);
-            node->ConstSymtable.push_back(child_node_shared);
+            node->const_defs.push_back(child_node_shared);
             q.pop();
         }       
         return node;
@@ -83,11 +83,12 @@ ASTNode *AST::transform_node_iter(syntax_tree_node *n)
     {
         auto node = new ASTConstDef();//
         node->id = n-> children[0]-> name;//IDENT
-        if(n->children_num == 3) //constExp不存在
-        node->Constinit_val = n->children[2]->name;
-        else if(n->children_num == 4)
+        auto const_init_val_node = static_cast<ASTConstInitVal*>(transform_node_iter(n-> children[n->children_num - 1]));
+        node->const_init_val = std::shared_ptr<ASTConstInitVal>(const_init_val_node);
+        if(n->children_num == 4)
         {
-            node->Constinit_val = n-> children[3]-> name;
+            
+            
             auto list_ptr = n-> children[1];//ConstExpList，在这里利用队列直接存数组了
             std::queue<syntax_tree_node *> q;//ConstDef队列
             while (list_ptr->children_num == 4) {//LBRACKET ConstExp RBRACKET ConstExplist
@@ -101,7 +102,7 @@ ASTNode *AST::transform_node_iter(syntax_tree_node *n)
             {
                 auto child_node = static_cast<ASTConstExp *>(transform_node_iter(q.front()));//“先进”
                 auto child_node_shared =std::shared_ptr<ASTConstExp>(child_node);
-                node->ConstExpSymtable.push_back(child_node_shared);
+                node->ConstExps.push_back(child_node_shared);
                 q.pop();           
             }
         }
@@ -111,14 +112,15 @@ ASTNode *AST::transform_node_iter(syntax_tree_node *n)
     {
         auto node = new ASTVarDef();//
         node->id = n-> children[0]-> name;//IDENT
-        if(n->children_num == 3) //constExp不存在
-        node->init_val = n->children[2]->name;
-        else if(n->children_num == 4||n->children_num == 2)//Ident ConstExplist
+        if(n->children_num == 3 || n->children_num == 4)
         {
-            if(n->children_num == 4)
-            {
-                node->init_val = n-> children[3]-> name;
-            }
+            auto init_val_node = static_cast<ASTInitVal*>(transform_node_iter(n-> children[n->children_num - 1]));
+            node->init_val = std::shared_ptr<ASTInitVal>(init_val_node);
+        }
+        else{};
+        if(n->children_num == 4||n->children_num == 2)//Ident ConstExplist
+        {
+
             auto list_ptr = n-> children[1];//ConstExpList，在这里利用队列直接存数组了
             std::queue<syntax_tree_node *> q;//ConstDef队列
             while (list_ptr->children_num == 4){//LBRACKET ConstExp RBRACKET ConstExplist
@@ -132,7 +134,7 @@ ASTNode *AST::transform_node_iter(syntax_tree_node *n)
             {
                 auto child_node = static_cast<ASTConstExp *>(transform_node_iter(q.front()));//“先进”
                 auto child_node_shared =std::shared_ptr<ASTConstExp>(child_node);
-                node->ConstSymtable.push_back(child_node_shared);
+                node->ConstExprs.push_back(child_node_shared);
                 q.pop();           
             }
         }
@@ -156,7 +158,7 @@ ASTNode *AST::transform_node_iter(syntax_tree_node *n)
         {
             auto child_node = static_cast<ASTVarDef *>(transform_node_iter(q.front()));//“先进”
             auto child_node_shared =std::shared_ptr<ASTVarDef>(child_node);
-            node->VarSymtable.push_back(child_node_shared);
+            node->var_defs.push_back(child_node_shared);
             q.pop();
         }       
         return node;
@@ -166,7 +168,7 @@ ASTNode *AST::transform_node_iter(syntax_tree_node *n)
         if(n->children_num == 1)
         return transform_node_iter(n->children[0]);
         else if(n->children_num == 2)
-        //return 
+        return new ASTConstInitVal();
         else if (n->children_num == 3)
         {            
             return  transform_node_iter(n->children[1]);            
@@ -233,7 +235,7 @@ ASTNode *AST::transform_node_iter(syntax_tree_node *n)
         {
             auto child_node = static_cast<ASTFuncFParam *>(transform_node_iter(q.front()));//“先进”
             auto child_node_shared =std::shared_ptr<ASTFuncFParam>(child_node);
-            node->FuncFParamtable.push_back(child_node_shared);
+            node->func_fparams.push_back(child_node_shared);
             q.pop();
         }       
         return node;
@@ -261,9 +263,9 @@ ASTNode *AST::transform_node_iter(syntax_tree_node *n)
             }
             while(!q.empty())//是否要传达数组这一消息？有疑问
             {
-                auto child_node = static_cast<ASTAddExp *>(transform_node_iter(q.front()->children[0]));//“先进”
-                auto child_node_shared =std::shared_ptr<ASTAddExp>(child_node);
-                node->AddExptable.push_back(child_node_shared);
+                auto child_node = static_cast<ASTExp *>(transform_node_iter(q.front()->children[0]));//“先进”
+                auto child_node_shared =std::shared_ptr<ASTExp>(child_node);
+                node->Exps.push_back(child_node_shared);
                 q.pop();
             }       
 
@@ -271,7 +273,7 @@ ASTNode *AST::transform_node_iter(syntax_tree_node *n)
     }
     else if(_STR_EQ(n->name,"Block"))
     {
-        auto->node = ASTBlock();
+        auto node = new ASTBlock();
         auto list_ptr= n->children[1];
         std::queue<syntax_tree_node *> q;
         if (list_ptr->children_num == 2) {
@@ -282,17 +284,17 @@ ASTNode *AST::transform_node_iter(syntax_tree_node *n)
         }
         while(!q.empty())
             {
-                if(_STR_EQ(q.top()->children[0]->name,"Decl"))
+                if(_STR_EQ(q.front()->children[0]->name,"Decl"))
                 {
                     auto child_node = static_cast<ASTDecl *>(transform_node_iter(q.front()->children[0]));//“先进”
                     auto child_node_shared =std::shared_ptr<ASTDecl>(child_node);
-                    node->Decltable.push_back(child_node_shared);
+                    node->Decls.push_back(child_node_shared);
                 }
-                if(_STR_EQ(q.top()->children[0]->name,"Stmt"))
+                if(_STR_EQ(q.front()->children[0]->name,"Stmt"))
                 {
                     auto child_node = static_cast<ASTStmt *>(transform_node_iter(q.front()->children[0]));//“先进”
                     auto child_node_shared =std::shared_ptr<ASTStmt>(child_node);
-                    node->Stmttable.push_back(child_node_shared);
+                    node->Stmts.push_back(child_node_shared);
                 }
                 q.pop();
             }       
