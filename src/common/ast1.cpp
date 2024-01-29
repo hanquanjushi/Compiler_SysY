@@ -37,7 +37,7 @@ ASTNode *AST::transform_node_iter(syntax_tree_node *n)
         s.push(list_ptr->children[0]);//Decl(FuncDef)
         while (!s.empty()) {
             if(_STR_EQ(s.top()->name,"Decl"))// 有两种可能的属性：Decl,FuncDef  
-            {
+            {//想到了一个很严重的问题，这个拆分会不会导致顺序混乱
                 auto child_node = static_cast<ASTDecl *>(transform_node_iter(s.top()));
                 auto child_node_shared =std::shared_ptr<ASTDecl>(child_node);
                 node->decls.push_back(child_node_shared);//CompUnit有个成员变量，存声明：名字可修改
@@ -285,7 +285,7 @@ ASTNode *AST::transform_node_iter(syntax_tree_node *n)
         }
         while(!q.empty())
             {
-                if(_STR_EQ(q.front()->children[0]->name,"Decl"))
+                if(_STR_EQ(q.front()->children[0]->name,"Decl"))//想到了一个很严重的问题，这个拆分会不会导致顺序混乱
                 {
                     auto child_node = static_cast<ASTDecl *>(transform_node_iter(q.front()->children[0]));//“先进”
                     auto child_node_shared =std::shared_ptr<ASTDecl>(child_node);
@@ -319,19 +319,27 @@ ASTNode *AST::transform_node_iter(syntax_tree_node *n)
         else if(_STR_EQ(n->children[0]->name,"IF"))
         { 
             auto node = new ASTIfStmt();
-
+            auto cond_node =static_cast<ASTCond *>(transform_node_iter(n->children[2]));
+            node ->condition = std::shared_ptr<ASTCond>(cond_node);
+            node ->ifStatement= std::shared_ptr<ASTStmt>(static_cast<ASTStmt *>(transform_node_iter(n->children[4])));
+            if(n->children_num  == 7)
+            {
+                node -> elseStatement = std::shared_ptr<ASTStmt>(static_cast<ASTStmt *>(transform_node_iter(n->children[6])));
+            }
+            return node;
         }
         else if(_STR_EQ(n->children[0]->name,"CONTINUE"))
         {
-
+            return new ASTContinueStmt();
         }
         else if(_STR_EQ(n->children[0]->name,"BREAK"))
         {
-
+            return new ASTBreakStmt();
         }
         else if(_STR_EQ(n->children[1]->name,"ASSIGN"))
         {
-            
+            auto node = new ASTAssignmentStmt();
+            node->lval =  std::shared_ptr<ASTLVal>(static_cast<ASTLVal *>(transform_node_iter(n->children[4]))); 
         }
 
     }

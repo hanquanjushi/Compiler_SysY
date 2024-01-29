@@ -123,6 +123,7 @@ struct ASTCompUnit : ASTNode
 {
     virtual Value *accept(ASTVisitor &) override final;
     virtual ~ASTCompUnit() = default;
+    //想到了一个很严重的问题，这个拆分会不会导致顺序混乱
     std::vector<std::shared_ptr<ASTDecl>> decls;
     std ::vector<std::shared_ptr<ASTFuncDef>> func_defs;
 };
@@ -238,6 +239,7 @@ struct ASTBlock : ASTNode
     //std::vector<std::shared_ptr<ASTBlockItem>> block_items;
     std::vector<std::shared_ptr<ASTDecl>> Decls;
     std::vector<std::shared_ptr<ASTStmt>> Stmts;
+    //想到了一个很严重的问题，这个拆分会不会导致顺序混乱
 };
 
 // struct ASTBlockItem : ASTNode
@@ -260,12 +262,11 @@ struct ASTAssignmentStmt :  ASTStmt {
 
 struct ASTExpStmt :  ASTStmt {
     std::shared_ptr<ASTExp> exp; // 可选的表达式
-
+//Exp SEMICOLON||SEMICOLON---->这里进行了整合
 };
 
 struct ASTBlockStmt :  ASTStmt {
-    std::vector<std::shared_ptr<ASTStmt>> statements;
-
+    std::vector<std::shared_ptr<ASTBlock>> statements;
 };
 
 struct ASTIfStmt :  ASTStmt {
