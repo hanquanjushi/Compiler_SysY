@@ -252,6 +252,50 @@ struct ASTStmt : ASTBlock
     virtual ~ASTStmt() = default;
 };
 
+struct ASTAssignmentStmt :  ASTStmt {
+    std::shared_ptr<ASTLVal> lval;
+    std::shared_ptr<ASTExp> exp;
+
+};
+
+struct ASTExpStmt :  ASTStmt {
+    std::shared_ptr<ASTExp> exp; // 可选的表达式
+
+};
+
+struct ASTBlockStmt :  ASTStmt {
+    std::vector<std::shared_ptr<ASTStmt>> statements;
+
+};
+
+struct ASTIfStmt :  ASTStmt {
+    std::shared_ptr<ASTCond> condition;
+    std::shared_ptr<ASTStmt> ifStatement;
+    std::shared_ptr<ASTStmt> elseStatement; // 可选的 else 语句
+
+    
+};
+
+struct ASTWhileStmt :  ASTStmt {
+    std::shared_ptr<ASTCond> condition;
+    std::shared_ptr<ASTStmt> loopStatement;
+
+};
+
+struct ASTBreakStmt :  ASTStmt {
+
+};
+
+struct ASTContinueStmt : ASTStmt {
+
+};
+
+struct ASTReturnStmt :  ASTStmt {
+    std::shared_ptr<ASTExp> returnValue; // 可选的返回值表达式
+
+};
+
+
 struct ASTExp : ASTNode
 {
 

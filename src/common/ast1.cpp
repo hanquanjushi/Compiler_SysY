@@ -269,7 +269,8 @@ ASTNode *AST::transform_node_iter(syntax_tree_node *n)
                 q.pop();
             }       
 
-        }        
+        }
+        return node;        
     }
     else if(_STR_EQ(n->name,"Block"))
     {
@@ -297,11 +298,41 @@ ASTNode *AST::transform_node_iter(syntax_tree_node *n)
                     node->Stmts.push_back(child_node_shared);
                 }
                 q.pop();
-            }       
+            } 
+            return node;      
         
     }
     else if(_STR_EQ(n->name,"Stmt"))
     {
+        
+        if(_STR_EQ(n->children[0]->name,"RETURN"))
+        {
+            auto node = new ASTReturnStmt();
+            if(n->children_num == 3)
+            {
+                auto child_node = static_cast<ASTExp *>(transform_node_iter(n->children[1]));
+                auto child_node_shared = std::shared_ptr<ASTExp>(child_node);
+                node -> returnValue = child_node_shared;
+            }
+                return node;
+        }
+        else if(_STR_EQ(n->children[0]->name,"IF"))
+        { 
+            auto node = new ASTIfStmt();
+
+        }
+        else if(_STR_EQ(n->children[0]->name,"CONTINUE"))
+        {
+
+        }
+        else if(_STR_EQ(n->children[0]->name,"BREAK"))
+        {
+
+        }
+        else if(_STR_EQ(n->children[1]->name,"ASSIGN"))
+        {
+            
+        }
 
     }
 }
