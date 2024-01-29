@@ -165,51 +165,63 @@ ASTNode *AST::transform_node_iter(syntax_tree_node *n)
     }
     else if(_STR_EQ(n->name,"ConstInitval"))//写的不好,打算重写，这里单纯递归不太行
     {
+        auto node = new ASTConstInitVal();
         if(n->children_num == 1)
-        return transform_node_iter(n->children[0]);
+        {
+            node->const_exp = std::shared_ptr<ASTConstExp>(static_cast<ASTConstExp *>(transform_node_iter(n->children[0])));
+            return node;
+        }
         else if(n->children_num == 2)
-        return new ASTConstInitVal();
+        {
+            //nop
+            return node;
+        }
         else if (n->children_num == 3)
         {            
-            return  transform_node_iter(n->children[1]);            
+            node->const_init_val_Lists = std::shared_ptr<ASTConstInitValList>(static_cast<ASTConstInitValList *>(transform_node_iter(n->children[1])));
         }
     }
     else if(_STR_EQ(n->name, "ConstInitValList"))
     {
+            auto node = new ASTConstInitValList();
+            node->const_init_vals = std::shared_ptr<ASTConstInitVal>(static_cast<ASTConstInitVal *>(transform_node_iter(n->children[0])));
         if (n->children_num == 3)
         {
-            auto node = new ASTConstInitValList();
-            auto val = transform_node_iter(n->children[0]);
-            auto rest = transform_node_iter(n->children[2]);
-           
+            node->const_init_valLists = std::shared_ptr<ASTConstInitValList>(static_cast<ASTConstInitValList *>(transform_node_iter(n->children[2])));
+            //auto rest = transform_node_iter(n->children[2]);       
         } 
 
-        else if (n->children_num == 1)
-            return transform_node_iter(n->children[0]);
+        return node;
     }
-    else if(_STR_EQ(n->name,"Initval"))//写的不好,打算重写，这里单纯递归不太行,要结合hpp文件
+    else if(_STR_EQ(n->name,"Initval"))//写的不好,打算重写(发现一个很有意思的问题：ConstInitval和Initval明明结构相似，在Bison的实现却不同)
     {
+        auto node = new ASTInitVal();
         if(n->children_num == 1)
-        return transform_node_iter(n->children[0]);
+        {
+            node-> exp = std::shared_ptr<ASTExp>(static_cast<ASTExp *>(transform_node_iter(n->children[0])));
+            return node;
+        }
         else if(n->children_num == 2)
-        return new ASTInitVal();//新创建
+        {
+            //nop
+            return node;
+        }
         else if (n->children_num == 3)
         {            
-            return  transform_node_iter(n->children[1]);            
+            node->init_val_Lists = std::shared_ptr<ASTInitValList>(static_cast<ASTInitValList *>(transform_node_iter(n->children[1])));
         }
     }
     else if(_STR_EQ(n->name, "InitValList"))
     {
+        auto node = new ASTInitValList();
+        node->init_vals = std::shared_ptr<ASTInitVal>(static_cast<ASTInitVal *>(transform_node_iter(n->children[0])));
         if (n->children_num == 3)
         {
-            auto node = new ASTInitValList();
-            auto val = transform_node_iter(n->children[0]);
-            auto rest = transform_node_iter(n->children[2]);
-           
+            node->init_valLists = std::shared_ptr<ASTInitValList>(static_cast<ASTInitValList *>(transform_node_iter(n->children[2])));
+            //auto rest = transform_node_iter(n->children[2]);       
         } 
 
-        else if (n->children_num == 1)
-            return transform_node_iter(n->children[0]);
+        return node;
     }
     else if (_STR_EQ(n->name, "FuncDef"))
     {
@@ -339,7 +351,13 @@ ASTNode *AST::transform_node_iter(syntax_tree_node *n)
         else if(_STR_EQ(n->children[1]->name,"ASSIGN"))
         {
             auto node = new ASTAssignmentStmt();
-            node->lval =  std::shared_ptr<ASTLVal>(static_cast<ASTLVal *>(transform_node_iter(n->children[4]))); 
+            node->lval =  std::shared_ptr<ASTLVal>(static_cast<ASTLVal *>(transform_node_iter(n->children[0]))); 
+            node->exp =  std::shared_ptr<ASTExp>(static_cast<ASTExp *>(transform_node_iter(n->children[2])));
+            return node; 
+        }
+        else if(n->children[0]->name,"Block")
+        {
+            
         }
 
     }

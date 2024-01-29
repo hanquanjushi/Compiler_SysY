@@ -123,7 +123,7 @@ struct ASTCompUnit : ASTNode
 {
     virtual Value *accept(ASTVisitor &) override final;
     virtual ~ASTCompUnit() = default;
-    //想到了一个很严重的问题，这个拆分会不会导致顺序混乱
+    //想到了一个很严重的问题，这个拆分会不会导致顺序混乱,如何解决？
     std::vector<std::shared_ptr<ASTDecl>> decls;
     std ::vector<std::shared_ptr<ASTFuncDef>> func_defs;
 };
@@ -163,12 +163,16 @@ struct ASTConstInitVal : ASTNode
     virtual Value *accept(ASTVisitor &) override final;
     virtual ~ASTConstInitVal() = default;
     std::shared_ptr<ASTConstExp> const_exp;
+    std::shared_ptr<ASTConstInitValList> const_init_val_Lists;
 };
 
 struct ASTConstInitValList : ASTNode
 {
     virtual Value *accept(ASTVisitor &) override final;
     virtual ~ASTConstInitValList() = default;
+    std::shared_ptr<ASTConstInitVal> const_init_vals;
+    std::shared_ptr<ASTConstInitValList> const_init_valLists;
+
 }; 
 
 struct ASTVarDecl : ASTDecl
@@ -193,11 +197,14 @@ struct ASTInitVal : ASTNode
     virtual Value *accept(ASTVisitor &) override final;
     virtual ~ASTInitVal() = default;
     std::shared_ptr<ASTExp> exp;
+    std::shared_ptr<ASTInitValList> init_val_Lists;
 };
 struct ASTInitValList : ASTNode
 {
     virtual Value *accept(ASTVisitor &) override final;
     virtual ~ASTInitValList() = default;
+    std::shared_ptr<ASTInitVal> init_vals;
+    std::shared_ptr<ASTInitValList> init_valLists;
 }; 
 struct ASTFuncDef : ASTDecl
 {
@@ -265,9 +272,9 @@ struct ASTExpStmt :  ASTStmt {
 //Exp SEMICOLON||SEMICOLON---->这里进行了整合
 };
 
-struct ASTBlockStmt :  ASTStmt {
-    std::vector<std::shared_ptr<ASTBlock>> statements;
-};
+// struct ASTBlockStmt :  ASTStmt {
+//     std::vector<std::shared_ptr<ASTBlock>> statements;
+// };
 
 struct ASTIfStmt :  ASTStmt {
     std::shared_ptr<ASTCond> condition;
