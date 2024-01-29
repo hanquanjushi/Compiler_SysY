@@ -121,22 +121,22 @@ struct ASTNode
 
 struct ASTCompUnit : ASTNode
 {
-    virtual Value *accept(ASTVisitor &) override final;
+    virtual Value *accept(ASTVisitor &) override;
     virtual ~ASTCompUnit() = default;
     //想到了一个很严重的问题，这个拆分会不会导致顺序混乱,如何解决？
     std::vector<std::shared_ptr<ASTDecl>> decls;
     std ::vector<std::shared_ptr<ASTFuncDef>> func_defs;
 };
 
-struct ASTDecl : ASTNode
+struct ASTDecl : ASTCompUnit
 {
-
+    virtual Value *accept(ASTVisitor& visitor) override final;
     virtual ~ASTDecl() = default;
 };
 
 struct ASTConstDecl : ASTDecl
 {
-    virtual Value *accept(ASTVisitor &) override final;
+    //virtual Value *accept(ASTVisitor &) override final;
     virtual ~ASTConstDecl() = default;
     SysYType type;
     std::vector<std::shared_ptr<ASTConstDef>> const_defs;
@@ -149,7 +149,7 @@ struct ASTConstDecl : ASTDecl
 //     CminType type;
 // };
 
-struct ASTConstDef : ASTNode
+struct ASTConstDef : ASTCompUnit
 {
     virtual Value *accept(ASTVisitor &) override final;
     virtual ~ASTConstDef() = default;
@@ -177,7 +177,7 @@ struct ASTConstInitValList : ASTNode
 
 struct ASTVarDecl : ASTDecl
 {
-    virtual Value *accept(ASTVisitor &) override final;
+    //virtual Value *accept(ASTVisitor &) override final;
     virtual ~ASTVarDecl() = default;
     SysYType type;
     std::vector<std::shared_ptr<ASTVarDef>> var_defs;
@@ -198,6 +198,7 @@ struct ASTInitVal : ASTNode
     virtual ~ASTInitVal() = default;
     std::shared_ptr<ASTExp> exp;
     std::shared_ptr<ASTInitValList> init_val_Lists;
+    std::shared_ptr<ASTInitVal> init_vals;
 };
 struct ASTInitValList : ASTNode
 {
@@ -208,7 +209,7 @@ struct ASTInitValList : ASTNode
 }; 
 struct ASTFuncDef : ASTDecl
 {
-    virtual Value *accept(ASTVisitor &) override final;
+    //virtual Value *accept(ASTVisitor &) override final;
     virtual ~ASTFuncDef() = default;
     SysYType type;
     std::string id;
@@ -320,6 +321,8 @@ struct ASTLVal : ASTNode
 {
     virtual Value *accept(ASTVisitor &) override final;
     virtual ~ASTLVal() = default;
+    std::string id;
+    std::vector<std::shared_ptr<ASTExp>> exps_cond;
 };
 
 struct ASTPrimaryExp : ASTExp
@@ -363,7 +366,8 @@ struct ASTMulExp : ASTExp
     virtual ~ASTMulExp() = default;
     std::shared_ptr<ASTMulExp> mul_exp;
     std::shared_ptr<ASTUnaryExp> unary_exp;
-    std::shared_ptr<MulOp> mul_op;
+    MulOp mul_op;
+    
 };
 
 struct ASTAddExp : ASTExp
@@ -372,7 +376,7 @@ struct ASTAddExp : ASTExp
     virtual ~ASTAddExp() = default;
     std::shared_ptr<ASTAddExp> add_exp;
     std::shared_ptr<ASTMulExp> mul_exp;
-    std::shared_ptr<AddOp> add_op;
+    AddOp add_op;
 };
 
 struct ASTRelExp : ASTExp
@@ -381,7 +385,7 @@ struct ASTRelExp : ASTExp
     virtual ~ASTRelExp() = default;
     std::shared_ptr<ASTRelExp> rel_exp;
     std::shared_ptr<ASTAddExp> add_exp;
-    std::shared_ptr<RelOp> rel_op;
+    RelOp rel_op;
 };
 
 struct ASTEqExp : ASTExp
@@ -390,7 +394,7 @@ struct ASTEqExp : ASTExp
     virtual ~ASTEqExp() = default;
     std::shared_ptr<ASTEqExp> eq_exp;
     std::shared_ptr<ASTRelExp> rel_exp;
-    std::shared_ptr<EqOp> eq_op;
+    EqOp eq_op;
 };
 
 struct ASTLAndExp : ASTExp
@@ -413,7 +417,7 @@ struct ASTConstExp : ASTExp
 {
     virtual Value *accept(ASTVisitor &) override final;
     virtual ~ASTConstExp() = default;
-    std::shared_ptr<ASTLOrExp> lor_exp;
+    //std::shared_ptr<ASTLOrExp> lor_exp;
 };
 
 class ASTVisitor

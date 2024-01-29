@@ -206,18 +206,22 @@ ASTNode *AST::transform_node_iter(syntax_tree_node *n)
             //nop
             return node;
         }
-        else if (n->children_num == 3)
+        else if(n->children_num == 3)
+        {
+            node->init_vals = std::shared_ptr<ASTInitVal>(static_cast<ASTInitVal *>(transform_node_iter(n->children[1])));
+        }
+        else if (n->children_num == 4)
         {            
-            node->init_val_Lists = std::shared_ptr<ASTInitValList>(static_cast<ASTInitValList *>(transform_node_iter(n->children[1])));
+            node->init_val_Lists = std::shared_ptr<ASTInitValList>(static_cast<ASTInitValList *>(transform_node_iter(n->children[2])));
         }
     }
     else if(_STR_EQ(n->name, "InitValList"))
     {
         auto node = new ASTInitValList();
-        node->init_vals = std::shared_ptr<ASTInitVal>(static_cast<ASTInitVal *>(transform_node_iter(n->children[0])));
+        node->init_vals = std::shared_ptr<ASTInitVal>(static_cast<ASTInitVal *>(transform_node_iter(n->children[n->children_num - 1])));
         if (n->children_num == 3)
         {
-            node->init_valLists = std::shared_ptr<ASTInitValList>(static_cast<ASTInitValList *>(transform_node_iter(n->children[2])));
+            node->init_valLists = std::shared_ptr<ASTInitValList>(static_cast<ASTInitValList *>(transform_node_iter(n->children[0])));
             //auto rest = transform_node_iter(n->children[2]);       
         } 
 
@@ -355,11 +359,164 @@ ASTNode *AST::transform_node_iter(syntax_tree_node *n)
             node->exp =  std::shared_ptr<ASTExp>(static_cast<ASTExp *>(transform_node_iter(n->children[2])));
             return node; 
         }
-        else if(n->children[0]->name,"Block")
+        else if(_STR_EQ(n->children[0]->name,"Block"))
         {
-            
+
         }
 
     }
+    else if(_STR_EQ(n->name,"Cond"))
+    {
+
+    }
+    else if(_STR_EQ(n->name,"LVal"))
+    {
+        auto node = new ASTLVal();
+        node->id = n->children[0]->name;
+        std::queue<syntax_tree_node *> q;
+        auto list_ptr = n ->children[1];
+        while(list_ptr->children_num == 4)
+        {
+            q.push(list_ptr->children[1]);
+            list_ptr = list_ptr -> children[3];
+        }
+        
+    }
+    else if(_STR_EQ(n->name,"PrimaryExp"))//number的处理有意思
+    {
+
+    }
+    else if(_STR_EQ(n->name,"UnaryExp"))//UnaryOp
+    {
+
+    }
+    else if(_STR_EQ(n->name,"MulExp"))
+    {
+        auto node =new ASTMulExp();
+        if(n->children_num == 3)
+        {
+            if(_STR_EQ(n->children[1]->name,"MUL"))
+            {
+                node->mul_op = OP_MUL;
+            }
+            if(_STR_EQ(n->children[1]->name,"DIV"))
+            {
+                node->mul_op = OP_DIV;
+            }
+            if(_STR_EQ(n->children[1]->name,"PER"))
+            {
+                node->mul_op = OP_MOD;
+            }
+        }
+        node->unary_exp = std::shared_ptr<ASTUnaryExp>(static_cast<ASTUnaryExp *>(transform_node_iter(n->children[n->children_num - 1])));
+        if(n->children_num == 3)
+        {
+            node->mul_exp = std::shared_ptr<ASTMulExp>(static_cast<ASTMulExp *>(transform_node_iter(n->children[0])));
+        }
+        
+        return node;
+    }
+    else if(_STR_EQ(n->name,"AddExp"))
+    {
+        auto node =new ASTAddExp();
+        if(n->children_num == 3)
+        {
+            if(_STR_EQ(n->children[1]->name,"ADD"))
+            {
+                node->add_op =OP_PLUS;
+            }
+            if(_STR_EQ(n->children[1]->name,"SUB"))
+            {
+                node->add_op = OP_MINUS;
+            }           
+        }
+        node->mul_exp = std::shared_ptr<ASTMulExp>(static_cast<ASTMulExp *>(transform_node_iter(n->children[n->children_num - 1])));
+        if(n->children_num == 3)
+        {
+            node->add_exp = std::shared_ptr<ASTAddExp>(static_cast<ASTAddExp *>(transform_node_iter(n->children[0])));
+        }
+        
+        return node;
+    }
+    else if(_STR_EQ(n->name,"RelExp"))
+    {
+         auto node =new ASTRelExp();
+        if(n->children_num == 3)
+        {
+            if(_STR_EQ(n->children[1]->name,"LT"))
+            {
+                node->rel_op =OP_LT;
+            }
+            if(_STR_EQ(n->children[1]->name,"GT"))
+            {
+                node->rel_op = OP_GT;
+            }
+            if(_STR_EQ(n->children[1]->name,"LTE"))
+            {
+                node->rel_op = OP_LE;
+            }
+            if(_STR_EQ(n->children[1]->name,"GTE"))
+            {
+                node->rel_op = OP_GE;//需要定义
+            }
+
+        }
+        node->add_exp = std::shared_ptr<ASTAddExp>(static_cast<ASTAddExp *>(transform_node_iter(n->children[n->children_num - 1])));
+        if(n->children_num == 3)
+        {
+            node->rel_exp = std::shared_ptr<ASTRelExp>(static_cast<ASTRelExp *>(transform_node_iter(n->children[0])));
+        }
+        return node;
+    }
+    else if(_STR_EQ(n->name,"EqExp"))
+    {
+        auto node =new ASTEqExp();
+        if(n->children_num == 3)
+        {
+            if(_STR_EQ(n->children[1]->name,"EQ"))
+            {
+                node->eq_op = OP_EQ;
+            }
+            if(_STR_EQ(n->children[1]->name,"NEQ"))
+            {
+                node->eq_op = OP_NEQ;
+            }           
+        }
+        node->rel_exp = std::shared_ptr<ASTRelExp>(static_cast<ASTRelExp *>(transform_node_iter(n->children[n->children_num - 1])));
+        if(n->children_num == 3)
+        {
+            node->eq_exp = std::shared_ptr<ASTEqExp>(static_cast<ASTEqExp *>(transform_node_iter(n->children[0])));
+        }
+        
+        return node;
+    }
+    else if(_STR_EQ(n->name,"LAndExp"))
+    {
+        auto node = new ASTLAndExp();
+        node->eq_exp = std::shared_ptr<ASTEqExp>(static_cast<ASTEqExp *>(transform_node_iter(n->children[n->children_num - 1])));
+        if(n->children_num == 3)
+        {
+            node->land_exp = std::shared_ptr<ASTLAndExp>(static_cast<ASTLAndExp *>(transform_node_iter(n->children[0])));
+        }
+        return node; 
+    }
+     else if(_STR_EQ(n->name,"LOrExp"))
+    {
+        auto node = new ASTLOrExp();
+        node->land_exp = std::shared_ptr<ASTLAndExp>(static_cast<ASTLAndExp *>(transform_node_iter(n->children[n->children_num - 1])));
+        if(n->children_num == 3)
+        {
+            node->lor_exp = std::shared_ptr<ASTLOrExp>(static_cast<ASTLOrExp *>(transform_node_iter(n->children[0])));
+        }
+        return node; 
+    }
+    else if(_STR_EQ(n->name,"Exp"))
+    {
+        return transform_node_iter(n->children[0]);
+    }
+    else if(_STR_EQ(n->name,"ConstExp"))
+    {
+        return transform_node_iter(n->children[0]);
+    }
 }
-Value* ASTCompUnit::accept(ASTVisitor &visitor) { return visitor.visit(*this); }// 等等
+//Value* ASTCompUnit::accept(ASTVisitor &visitor) { return visitor.visit(*this); }// 等等
