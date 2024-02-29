@@ -1,0 +1,7 @@
+	Fail
+126
+SUCCESS
+126
+SUCCESS
+126
+generation success

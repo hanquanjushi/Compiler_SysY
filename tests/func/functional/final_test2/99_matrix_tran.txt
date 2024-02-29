@@ -1,0 +1,6 @@
+000
+111
+222
+
+0
+generation success

@@ -1,0 +1,477 @@
+==========./testcases/functional/00_main.sy==========
+3
+							      )	3
+==========./testcases/functional/01_var_defn2.sy==========
+10
+							      )	10
+==========./testcases/functional/02_var_defn3.sy==========
+5
+							      )	5
+==========./testcases/functional/03_arr_defn2.sy==========
+0
+							      )	0
+==========./testcases/functional/04_arr_defn3.sy==========
+14							      |
+							      >	13
+==========./testcases/functional/05_arr_defn4.sy==========
+==========./testcases/functional/06_const_var_defn2.sy==========
+5
+							      )	5
+==========./testcases/functional/07_const_var_defn3.sy==========
+5
+							      )	5
+==========./testcases/functional/08_const_array_defn.sy==========
+4
+							      )	4
+==========./testcases/functional/09_func_defn.sy==========
+9
+							      )	9
+==========./testcases/functional/10_var_defn_func.sy==========
+4
+							      )	4
+==========./testcases/functional/11_add2.sy==========
+9
+							      )	9
+==========./testcases/functional/12_addc.sy==========
+15
+							      )	15
+==========./testcases/functional/13_sub2.sy==========
+248
+							      )	248
+==========./testcases/functional/14_subc.sy==========
+8
+							      )	8
+==========./testcases/functional/15_mul.sy==========
+50
+							      )	50
+==========./testcases/functional/16_mulc.sy==========
+25
+							      )	25
+==========./testcases/functional/17_div.sy==========
+2
+							      )	2
+==========./testcases/functional/18_divc.sy==========
+2
+							      )	2
+==========./testcases/functional/19_mod.sy==========
+3
+							      )	3
+==========./testcases/functional/20_rem.sy==========
+1
+							      )	1
+==========./testcases/functional/21_if_test2.sy==========
+-5								-5
+0								0
+==========./testcases/functional/22_if_test3.sy==========
+25
+							      )	25
+==========./testcases/functional/23_if_test4.sy==========
+25
+							      )	25
+==========./testcases/functional/24_if_test5.sy==========
+25
+							      )	25
+==========./testcases/functional/25_while_if.sy==========
+88								88
+0								0
+==========./testcases/functional/26_while_test1.sy==========
+3
+							      )	3
+==========./testcases/functional/27_while_test2.sy==========
+54
+							      )	54
+==========./testcases/functional/28_while_test3.sy==========
+23
+							      )	23
+==========./testcases/functional/29_break.sy==========
+201
+							      )	201
+==========./testcases/functional/30_continue.sy==========
+36
+							      )	36
+==========./testcases/functional/31_while_if_test1.sy==========
+198
+							      )	198
+==========./testcases/functional/32_while_if_test2.sy==========
+96
+							      )	96
+==========./testcases/functional/33_while_if_test3.sy==========
+88
+							      )	88
+==========./testcases/functional/34_arr_expr_len.sy==========
+==========./testcases/functional/35_op_priority1.sy==========
+40
+							      )	40
+==========./testcases/functional/36_op_priority2.sy==========
+24
+							      )	24
+==========./testcases/functional/37_op_priority3.sy==========
+40
+							      )	40
+==========./testcases/functional/38_op_priority4.sy==========
+1
+							      )	1
+==========./testcases/functional/39_op_priority5.sy==========
+1								1
+1								1
+==========./testcases/functional/40_unary_op.sy==========
+0
+							      )	0
+==========./testcases/functional/41_unary_op2.sy==========
+4								4
+0								0
+==========./testcases/functional/42_empty_stmt.sy==========
+21
+							      )	21
+==========./testcases/functional/43_logi_assign.sy==========
+1
+							      )	1
+==========./testcases/functional/44_stmt_expr.sy==========
+1024								1024
+0								0
+==========./testcases/functional/45_comment1.sy==========
+5
+							      )	5
+==========./testcases/functional/46_hex_defn.sy==========
+15
+							      )	15
+==========./testcases/functional/47_hex_oct_add.sy==========
+88
+							      )	88
+==========./testcases/functional/48_assign_complex_expr.sy==========
+-171								-171
+0								0
+==========./testcases/functional/49_if_complex_expr.sy==========
+2								2
+0								0
+==========./testcases/functional/50_short_circuit.sy==========
+11111210							11111210
+0								0
+==========./testcases/functional/51_short_circuit3.sy==========
+cminusfc: /home/hq/SysY/src/lightir/BasicBlock.cpp:37: void BasicBlock::add_instruction(Instruction*): Assertion `not is_terminated() && "Inserting instruction to terminated bb"' failed.
+==========./testcases/functional/52_scope.sy==========
+1								1
+0								0
+==========./testcases/functional/53_scope2.sy==========
+-40								-40
+62								62
+==========./testcases/functional/54_hidden_var.sy==========
+331								331
+1								1
+218							      |	000
+5								5
+6719								6719
+0
+							      )	0
+==========./testcases/functional/55_sort_test1.sy==========
+0								0
+1								1
+2								2
+3								3
+4								4
+5								5
+6								6
+7								7
+8								8
+9								9
+0
+							      )	0
+==========./testcases/functional/56_sort_test2.sy==========
+cminusfc: /home/hq/SysY/src/lightir/BasicBlock.cpp:37: void BasicBlock::add_instruction(Instruction*): Assertion `not is_terminated() && "Inserting instruction to terminated bb"' failed.
+==========./testcases/functional/57_sort_test3.sy==========
+cminusfc: /home/hq/SysY/src/lightir/BasicBlock.cpp:37: void BasicBlock::add_instruction(Instruction*): Assertion `not is_terminated() && "Inserting instruction to terminated bb"' failed.
+==========./testcases/functional/58_sort_test4.sy==========
+0								0
+1								1
+2								2
+3								3
+4								4
+5								5
+6								6
+7								7
+8								8
+9								9
+0
+							      )	0
+==========./testcases/functional/59_sort_test5.sy==========
+0								0
+1								1
+2								2
+3								3
+4								4
+5								5
+6								6
+7								7
+8								8
+9								9
+0
+							      )	0
+==========./testcases/functional/60_sort_test6.sy==========
+0								0
+1								1
+2								2
+3								3
+4								4
+5								5
+6								6
+7								7
+8								8
+9								9
+0
+							      )	0
+==========./testcases/functional/61_sort_test7.sy==========
+cminusfc: /home/hq/SysY/src/lightir/BasicBlock.cpp:37: void BasicBlock::add_instruction(Instruction*): Assertion `not is_terminated() && "Inserting instruction to terminated bb"' failed.
+==========./testcases/functional/62_percolation.sy==========
+8								8
+0
+							      )	0
+==========./testcases/functional/63_big_int_mul.sy==========
+==========./testcases/functional/64_calculator.sy==========
+cminusfc: /home/hq/SysY/src/lightir/BasicBlock.cpp:37: void BasicBlock::add_instruction(Instruction*): Assertion `not is_terminated() && "Inserting instruction to terminated bb"' failed.
+==========./testcases/functional/65_color.sy==========
+==========./testcases/functional/66_exgcd.sy==========
+13								13
+0								0
+==========./testcases/functional/67_reverse_output.sy==========
+5975945915885855825795765735705675645615585555525495465435405	5975945915885855825795765735705675645615585555525495465435405
+0								0
+==========./testcases/functional/68_brainfk.sy==========
+I'm Suzumiya Haruhi from the East Junior High School, and I'm								I'm Suzumiya Haruhi from the East Junior High School, and I'm								
+0
+							      )	0
+==========./testcases/functional/69_expr_eval.sy==========
+cminusfc: /home/hq/SysY/src/lightir/BasicBlock.cpp:37: void BasicBlock::add_instruction(Instruction*): Assertion `not is_terminated() && "Inserting instruction to terminated bb"' failed.
+==========./testcases/functional/70_dijkstra.sy==========
+0 1 8 4 13 17 						      |	12 12 12 12 12 12 
+							      >
+0								0
+==========./testcases/functional/71_full_conn.sy==========
+dog							      |
+cat							      |	139
+dog							      <
+dog							      <
+cat							      <
+cat							      <
+0							      <
+==========./testcases/functional/72_hanoi.sy==========
+1 2, 1 3, 2 3, 1 2, 3 1, 3 2, 1 2, 1 3, 2 3, 2 1, 3 1, 2 3, 1	1 2, 1 3, 2 3, 1 2, 3 1, 3 2, 1 2, 1 3, 2 3, 2 1, 3 1, 2 3, 1
+1 3, 1 2, 3 2, 1 3, 2 1, 2 3, 1 3, 1 2, 3 2, 3 1, 2 1, 3 2, 1	1 3, 1 2, 3 2, 1 3, 2 1, 2 3, 1 3, 1 2, 3 2, 3 1, 2 1, 3 2, 1
+1 3, 1 2, 3 2, 1 3, 2 1, 2 3, 1 3, 				1 3, 1 2, 3 2, 1 3, 2 1, 2 3, 1 3, 
+1 3, 1 2, 3 2, 1 3, 2 1, 2 3, 1 3, 1 2, 3 2, 3 1, 2 1, 3 2, 1	1 3, 1 2, 3 2, 1 3, 2 1, 2 3, 1 3, 1 2, 3 2, 3 1, 2 1, 3 2, 1
+0
+							      )	0
+==========./testcases/functional/73_int_io.sy==========
+4006571								4006571
+9900								9900
+1504379								1504379
+758219								758219
+99336677							99336677
+0
+							      )	0
+==========./testcases/functional/74_kmp.sy==========
+23							      |
+0							      |	139
+==========./testcases/functional/75_max_flow.sy==========
+77							      |
+0							      |	139
+==========./testcases/functional/76_n_queens.sy==========
+1								1
+1 3 5 2 4							1 3 5 2 4
+1 4 2 5 3							1 4 2 5 3
+2 4 1 3 5							2 4 1 3 5
+2 5 3 1 4							2 5 3 1 4
+3 1 4 2 5							3 1 4 2 5
+3 5 2 4 1							3 5 2 4 1
+4 1 3 5 2							4 1 3 5 2
+4 2 5 3 1							4 2 5 3 1
+5 2 4 1 3							5 2 4 1 3
+5 3 1 4 2							5 3 1 4 2
+2 4 6 1 3 5							2 4 6 1 3 5
+3 6 2 5 1 4							3 6 2 5 1 4
+4 1 5 2 6 3							4 1 5 2 6 3
+5 3 1 6 4 2							5 3 1 6 4 2
+1 5 8 6 3 7 2 4							1 5 8 6 3 7 2 4
+1 6 8 3 7 4 2 5							1 6 8 3 7 4 2 5
+1 7 4 6 8 2 5 3							1 7 4 6 8 2 5 3
+1 7 5 8 2 4 6 3							1 7 5 8 2 4 6 3
+2 4 6 8 3 1 7 5							2 4 6 8 3 1 7 5
+2 5 7 1 3 8 6 4							2 5 7 1 3 8 6 4
+2 5 7 4 1 8 6 3							2 5 7 4 1 8 6 3
+2 6 1 7 4 8 3 5							2 6 1 7 4 8 3 5
+2 6 8 3 1 4 7 5							2 6 8 3 1 4 7 5
+2 7 3 6 8 5 1 4							2 7 3 6 8 5 1 4
+2 7 5 8 1 4 6 3							2 7 5 8 1 4 6 3
+2 8 6 1 3 5 7 4							2 8 6 1 3 5 7 4
+3 1 7 5 8 2 4 6							3 1 7 5 8 2 4 6
+3 5 2 8 1 7 4 6							3 5 2 8 1 7 4 6
+3 5 2 8 6 4 7 1							3 5 2 8 6 4 7 1
+3 5 7 1 4 2 8 6							3 5 7 1 4 2 8 6
+3 5 8 4 1 7 2 6							3 5 8 4 1 7 2 6
+3 6 2 5 8 1 7 4							3 6 2 5 8 1 7 4
+3 6 2 7 1 4 8 5							3 6 2 7 1 4 8 5
+3 6 2 7 5 1 8 4							3 6 2 7 5 1 8 4
+3 6 4 1 8 5 7 2							3 6 4 1 8 5 7 2
+3 6 4 2 8 5 7 1							3 6 4 2 8 5 7 1
+3 6 8 1 4 7 5 2							3 6 8 1 4 7 5 2
+3 6 8 1 5 7 2 4							3 6 8 1 5 7 2 4
+3 6 8 2 4 1 7 5							3 6 8 2 4 1 7 5
+3 7 2 8 5 1 4 6							3 7 2 8 5 1 4 6
+3 7 2 8 6 4 1 5							3 7 2 8 6 4 1 5
+3 8 4 7 1 6 2 5							3 8 4 7 1 6 2 5
+4 1 5 8 2 7 3 6							4 1 5 8 2 7 3 6
+4 1 5 8 6 3 7 2							4 1 5 8 6 3 7 2
+4 2 5 8 6 1 3 7							4 2 5 8 6 1 3 7
+4 2 7 3 6 8 1 5							4 2 7 3 6 8 1 5
+4 2 7 3 6 8 5 1							4 2 7 3 6 8 5 1
+4 2 7 5 1 8 6 3							4 2 7 5 1 8 6 3
+4 2 8 5 7 1 3 6							4 2 8 5 7 1 3 6
+4 2 8 6 1 3 5 7							4 2 8 6 1 3 5 7
+4 6 1 5 2 8 3 7							4 6 1 5 2 8 3 7
+4 6 8 2 7 1 3 5							4 6 8 2 7 1 3 5
+4 6 8 3 1 7 5 2							4 6 8 3 1 7 5 2
+4 7 1 8 5 2 6 3							4 7 1 8 5 2 6 3
+4 7 3 8 2 5 1 6							4 7 3 8 2 5 1 6
+4 7 5 2 6 1 3 8							4 7 5 2 6 1 3 8
+4 7 5 3 1 6 8 2							4 7 5 3 1 6 8 2
+4 8 1 3 6 2 7 5							4 8 1 3 6 2 7 5
+4 8 1 5 7 2 6 3							4 8 1 5 7 2 6 3
+4 8 5 3 1 7 2 6							4 8 5 3 1 7 2 6
+5 1 4 6 8 2 7 3							5 1 4 6 8 2 7 3
+5 1 8 4 2 7 3 6							5 1 8 4 2 7 3 6
+5 1 8 6 3 7 2 4							5 1 8 6 3 7 2 4
+5 2 4 6 8 3 1 7							5 2 4 6 8 3 1 7
+5 2 4 7 3 8 6 1							5 2 4 7 3 8 6 1
+5 2 6 1 7 4 8 3							5 2 6 1 7 4 8 3
+5 2 8 1 4 7 3 6							5 2 8 1 4 7 3 6
+5 3 1 6 8 2 4 7							5 3 1 6 8 2 4 7
+5 3 1 7 2 8 6 4							5 3 1 7 2 8 6 4
+5 3 8 4 7 1 6 2							5 3 8 4 7 1 6 2
+5 7 1 3 8 6 4 2							5 7 1 3 8 6 4 2
+5 7 1 4 2 8 6 3							5 7 1 4 2 8 6 3
+5 7 2 4 8 1 3 6							5 7 2 4 8 1 3 6
+5 7 2 6 3 1 4 8							5 7 2 6 3 1 4 8
+5 7 2 6 3 1 8 4							5 7 2 6 3 1 8 4
+5 7 4 1 3 8 6 2							5 7 4 1 3 8 6 2
+5 8 4 1 3 6 2 7							5 8 4 1 3 6 2 7
+5 8 4 1 7 2 6 3							5 8 4 1 7 2 6 3
+6 1 5 2 8 3 7 4							6 1 5 2 8 3 7 4
+6 2 7 1 3 5 8 4							6 2 7 1 3 5 8 4
+6 2 7 1 4 8 5 3							6 2 7 1 4 8 5 3
+6 3 1 7 5 8 2 4							6 3 1 7 5 8 2 4
+6 3 1 8 4 2 7 5							6 3 1 8 4 2 7 5
+6 3 1 8 5 2 4 7							6 3 1 8 5 2 4 7
+6 3 5 7 1 4 2 8							6 3 5 7 1 4 2 8
+6 3 5 8 1 4 2 7							6 3 5 8 1 4 2 7
+6 3 7 2 4 8 1 5							6 3 7 2 4 8 1 5
+6 3 7 2 8 5 1 4							6 3 7 2 8 5 1 4
+6 3 7 4 1 8 2 5							6 3 7 4 1 8 2 5
+6 4 1 5 8 2 7 3							6 4 1 5 8 2 7 3
+6 4 2 8 5 7 1 3							6 4 2 8 5 7 1 3
+6 4 7 1 3 5 2 8							6 4 7 1 3 5 2 8
+6 4 7 1 8 2 5 3							6 4 7 1 8 2 5 3
+6 8 2 4 1 7 5 3							6 8 2 4 1 7 5 3
+7 1 3 8 6 4 2 5							7 1 3 8 6 4 2 5
+7 2 4 1 8 5 3 6							7 2 4 1 8 5 3 6
+7 2 6 3 1 4 8 5							7 2 6 3 1 4 8 5
+7 3 1 6 8 5 2 4							7 3 1 6 8 5 2 4
+7 3 8 2 5 1 6 4							7 3 8 2 5 1 6 4
+7 4 2 5 8 1 3 6							7 4 2 5 8 1 3 6
+7 4 2 8 6 1 3 5							7 4 2 8 6 1 3 5
+7 5 3 1 6 8 2 4							7 5 3 1 6 8 2 4
+8 2 4 1 7 5 3 6							8 2 4 1 7 5 3 6
+8 2 5 3 1 7 4 6							8 2 5 3 1 7 4 6
+8 3 1 6 2 5 7 4							8 3 1 6 2 5 7 4
+8 4 1 3 6 2 7 5							8 4 1 3 6 2 7 5
+107
+							      )	107
+==========./testcases/functional/77_substr.sy==========
+43								43
+6							      |	15
+							      >
+0								0
+==========./testcases/functional/78_side_effect.sy==========
+==========./testcases/functional/79_var_name.sy==========
+3							      |	537580451
+5							      |	537580454
+8							      |	1612748345
+13							      |	-2144638496
+21							      |	-531890151
+34							      |	1618438649
+55							      |	1086548498
+89							      |	-1589980149
+144							      |	34148797
+233							      |	-1555831351
+377							      |	-984102098
+610							      |	1755033848
+987							      |	770931757
+1597							      |	-1769001691
+2584							      |	-461196934
+4181							      |	2064768672
+6765							      |	1603571738
+10946							      |	-626626886
+236							      |
+							      >	125
+==========./testcases/functional/80_chaos_token.sy==========
+cminusfc: /home/hq/SysY/src/lightir/Instruction.cpp:175: CallInst::CallInst(Function*, std::vector<Value*>, BasicBlock*): Assertion `func_type->get_param_type(i) == args[i]->get_type() && "CallInst: Wrong arg type"' failed.
+==========./testcases/functional/81_skip_spaces.sy==========
+55
+							      )	55
+==========./testcases/functional/82_long_func.sy==========
+1							      |
+2							      |	139
+4							      <
+8							      <
+16							      <
+32							      <
+64							      <
+128							      <
+256							      <
+512							      <
+1024							      <
+2048							      <
+4096							      <
+8192							      <
+16384							      <
+32768							      <
+0							      <
+==========./testcases/functional/83_long_array.sy==========
+02425294124166176216218-22282-3478214271817021835771848521867 |
+216							      |	139
+==========./testcases/functional/84_long_array2.sy==========
+cminusfc: /home/hq/SysY/src/lightir/Instruction.cpp:175: CallInst::CallInst(Function*, std::vector<Value*>, BasicBlock*): Assertion `func_type->get_param_type(i) == args[i]->get_type() && "CallInst: Wrong arg type"' failed.
+==========./testcases/functional/85_long_code.sy==========
+cminusfc: /home/hq/SysY/src/lightir/BasicBlock.cpp:37: void BasicBlock::add_instruction(Instruction*): Assertion `not is_terminated() && "Inserting instruction to terminated bb"' failed.
+==========./testcases/functional/86_long_code2.sy==========
+160							      |
+							      >	139
+==========./testcases/functional/87_many_params.sy==========
+cminusfc: /home/hq/SysY/src/lightir/Instruction.cpp:175: CallInst::CallInst(Function*, std::vector<Value*>, BasicBlock*): Assertion `func_type->get_param_type(i) == args[i]->get_type() && "CallInst: Wrong arg type"' failed.
+==========./testcases/functional/88_many_params2.sy==========
+cminusfc: /home/hq/SysY/src/lightir/Instruction.cpp:175: CallInst::CallInst(Function*, std::vector<Value*>, BasicBlock*): Assertion `func_type->get_param_type(i) == args[i]->get_type() && "CallInst: Wrong arg type"' failed.
+==========./testcases/functional/89_many_globals.sy==========
+cminusfc: /home/hq/SysY/include/codegen/Register.hpp:40: static Reg Reg::a(unsigned int): Assertion `0 <= i and i <= 7' failed.
+==========./testcases/functional/90_many_locals.sy==========
+254								254
+0
+							      )	0
+==========./testcases/functional/91_many_locals2.sy==========
+01234567891011121314151617181920212223242526272829		01234567891011121314151617181920212223242526272829
+6								6
+25
+							      )	25
+==========./testcases/functional/92_register_alloc.sy==========
+194							      |
+194							      |	139
+==========./testcases/functional/93_nested_calls.sy==========
+250
+							      )	250
+==========./testcases/functional/94_nested_loops.sy==========
+cminusfc: /home/hq/SysY/src/lightir/BasicBlock.cpp:37: void BasicBlock::add_instruction(Instruction*): Assertion `not is_terminated() && "Inserting instruction to terminated bb"' failed.
+==========./testcases/functional/95_float.sy==========
+error at line 5 column 25: syntax error
+==========./testcases/functional/96_matrix_add.sy==========
+cminusfc: /home/hq/SysY/include/codegen/Register.hpp:40: static Reg Reg::a(unsigned int): Assertion `0 <= i and i <= 7' failed.
+==========./testcases/functional/98_matrix_mul.sy==========
+cminusfc: /home/hq/SysY/include/codegen/Register.hpp:40: static Reg Reg::a(unsigned int): Assertion `0 <= i and i <= 7' failed.
+==========./testcases/functional/99_matrix_tran.sy==========
+cminusfc: /home/hq/SysY/include/codegen/Register.hpp:40: static Reg Reg::a(unsigned int): Assertion `0 <= i and i <= 7' failed.
