@@ -11,7 +11,7 @@
             "program":   "${workspaceFolder}/build/cminusfc",
             "args": [
                 "-emit-llvm",
-                "${workspaceFolder}/tests/func/test.sy"
+                "${workspaceFolder}/tests/func/hidden_functional/09_BFS.sy"
             ],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",

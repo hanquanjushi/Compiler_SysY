@@ -14,6 +14,7 @@ Type *FLOATPTR_T;
 BasicBlock *trueBB = nullptr;       // 通用true分支
 BasicBlock *falseBB = nullptr;      // 通用false分支
 BasicBlock *nextBB_while = nullptr; // while语句后的下一个基本块
+BasicBlock *condBB_while = nullptr;
 bool promote(IRBuilder *builder, Value **l_val_p, Value **r_val_p)
 {
     bool is_int = false;
@@ -30,6 +31,16 @@ bool promote(IRBuilder *builder, Value **l_val_p, Value **r_val_p)
         is_int = l_val->get_type()->is_integer_type();
     }
     else if (l_val->get_type() == INT32_T && r_val->get_type() == INT8_T)
+    {
+        r_val = builder->create_zext(r_val, INT32_T);
+        is_int = l_val->get_type()->is_integer_type();
+    }
+    else if (l_val->get_type() == INT1_T && r_val->get_type() == INT32_T)
+    {
+        l_val = builder->create_zext(l_val, INT32_T);
+        is_int = l_val->get_type()->is_integer_type();
+    }
+    else if (l_val->get_type() == INT32_T && r_val->get_type() == INT1_T)
     {
         r_val = builder->create_zext(r_val, INT32_T);
         is_int = l_val->get_type()->is_integer_type();
@@ -318,7 +329,8 @@ Value *CminusfBuilder::visit(ASTWhileStmt &node)
     auto temp_trueBB = trueBB;
     auto temp_falseBB = falseBB;
     auto temp_nextBB_while = nextBB_while;
-    auto *condBB_while = BasicBlock::create(module.get(), "", context.func);
+    auto temp_condBB_while = condBB_while;
+    condBB_while = BasicBlock::create(module.get(), "", context.func);
     if (not builder->get_insert_block()->is_terminated())
     {
         builder->create_br(condBB_while);
@@ -330,16 +342,19 @@ Value *CminusfBuilder::visit(ASTWhileStmt &node)
     nextBB_while = falseBB;
     auto *ret_val = node.expression->accept(*this);
     Value *cond_val = nullptr;
-    if (ret_val->get_type()->is_integer_type())
+    if (ret_val->get_type() != VOID_T)
     {
-        cond_val = builder->create_icmp_ne(ret_val, CONST_INT(0));
-    }
-    else
-    {
-        cond_val = builder->create_fcmp_ne(ret_val, CONST_FP(0.));
-    }
+        if (ret_val->get_type()->is_integer_type())
+        {
+            cond_val = builder->create_icmp_ne(ret_val, CONST_INT(0));
+        }
+        else
+        {
+            cond_val = builder->create_fcmp_ne(ret_val, CONST_FP(0.));
+        }
 
-    builder->create_cond_br(cond_val, trueBB, falseBB);
+        builder->create_cond_br(cond_val, trueBB, falseBB);
+    }
     builder->set_insert_point(trueBB);
     node.statement->accept(*this);
     if (not builder->get_insert_block()->is_terminated())
@@ -350,6 +365,7 @@ Value *CminusfBuilder::visit(ASTWhileStmt &node)
     trueBB = temp_trueBB;
     falseBB = temp_falseBB;
     nextBB_while = temp_nextBB_while;
+    condBB_while = temp_condBB_while;
     return nullptr;
 }
 
@@ -532,8 +548,7 @@ Value *CminusfBuilder::visit(ASTEmptyStmt &node)
 }
 Value *CminusfBuilder::visit(ASTContinueStmt &node)
 {
-    // auto *condBB_while = BasicBlock::create(module.get(), "", context.func);
-    // builder->create_br(condBB_while);
+    builder->create_br(condBB_while);
     return nullptr;
 }
 
@@ -995,11 +1010,11 @@ Value *CminusfBuilder::visit(ASTAddExp &node)
         return l_val;
     }
     auto *r_val = node.mul_exp->accept(*this);
-    if(l_val->get_type() == INT1_T)
+    if (l_val->get_type() == INT1_T)
     {
         l_val = builder->create_zext(l_val, INT32_T);
     }
-    if(r_val->get_type() == INT1_T)
+    if (r_val->get_type() == INT1_T)
     {
         r_val = builder->create_zext(r_val, INT32_T);
     }
