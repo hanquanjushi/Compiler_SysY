@@ -30,7 +30,7 @@ label_entry:
   %op1 = alloca i32 
   store i32  0, i32 * %op1
   br label %label2
-label2:                                                ; preds = %label_entry, %label17
+label2:                                                ; preds = %label_entry, %label14, %label17
   %op3 = load i32 , i32 * %op0
   %op4 = icmp slt i32  %op3, 100
   %op5 = zext i1  %op4 to i32 
@@ -49,8 +49,8 @@ label14:                                                ; preds = %label7
   %op15 = load i32 , i32 * %op0
   %op16 = add i32  %op15, 1
   store i32  %op16, i32 * %op0
-  br label %label17
-label17:                                                ; preds = %label7, %label14
+  br label %label2
+label17:                                                ; preds = %label7
   %op18 = load i32 , i32 * %op1
   %op19 = load i32 , i32 * %op0
   %op20 = add i32  %op18, %op19

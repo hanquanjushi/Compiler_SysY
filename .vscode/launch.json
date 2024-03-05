@@ -10,8 +10,9 @@
             "request": "launch",
             "program":   "${workspaceFolder}/build/cminusfc",
             "args": [
-                "-emit-llvm",
-                "${workspaceFolder}/tests/func/hidden_functional/09_BFS.sy"
+                "-S",
+                "${workspaceFolder}/tests/3-codegen/autogen/testcases/functional/79_var_name.sy"
+
             ],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",

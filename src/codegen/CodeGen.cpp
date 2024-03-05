@@ -97,7 +97,7 @@ void CodeGen::load_from_stack_to_greg(Value *val, const Reg &reg)
     auto *type = val->get_type();
     if (IS_IMM_12(offset))
     {
-        if (type->is_int1_type()||type->is_int8_type())
+        if (type->is_int1_type() || type->is_int8_type())
         {
             append_inst(LOAD BYTE, {reg.print(), "$fp", offset_str});
         }
@@ -114,7 +114,7 @@ void CodeGen::load_from_stack_to_greg(Value *val, const Reg &reg)
     {
         load_large_int64(offset, reg);
         append_inst(ADD DOUBLE, {reg.print(), "$fp", reg.print()});
-        if (type->is_int1_type()||type->is_int8_type())
+        if (type->is_int1_type() || type->is_int8_type())
         {
             append_inst(LOAD BYTE, {reg.print(), reg.print(), "0"});
         }
@@ -136,7 +136,7 @@ void CodeGen::store_from_greg(Value *val, const Reg &reg)
     auto *type = val->get_type();
     if (IS_IMM_12(offset))
     {
-        if (type->is_int1_type()||type->is_int8_type())
+        if (type->is_int1_type() || type->is_int8_type())
         {
             append_inst(STORE BYTE, {reg.print(), "$fp", offset_str});
         }
@@ -154,7 +154,7 @@ void CodeGen::store_from_greg(Value *val, const Reg &reg)
         auto addr = Reg::t(8);
         load_large_int64(offset, addr);
         append_inst(ADD DOUBLE, {addr.print(), "$fp", addr.print()});
-        if (type->is_int1_type()||type->is_int8_type())
+        if (type->is_int1_type() || type->is_int8_type())
         {
             append_inst(STORE BYTE, {reg.print(), addr.print(), "0"});
         }
@@ -404,18 +404,22 @@ void CodeGen::gen_alloca()
      */
     // TODO 将 alloca 出空间的起始地址保存在栈帧上
     // 获取 alloca 分配的空间大小
-    auto *alloca_inst = static_cast<AllocaInst *>(context.inst);
-    auto size = alloca_inst->get_alloca_type()->get_size();
-
-    int offset = context.offset_map.at(context.inst);
-    offset -= size;
-    // 将分配的空间大小保存在栈帧上
- 
-    load_large_int64(offset, Reg::t(0));
-    append_inst("add.d $t0, $fp, $t0");
-   
-    // 将起始地址保存在栈帧上
-    store_from_greg(context.inst, Reg::t(0));
+    auto allocaInst = static_cast<AllocaInst *>(context.inst);
+    auto offset = context.offset_map.at(allocaInst);
+    auto size = allocaInst->get_alloca_type()->get_size();
+    offset -= size; // 起始地址
+    // 判断offset是否是12位
+    if (IS_IMM_12(offset))
+    {
+        append_inst("addi.d", {Reg::t(1).print(), Reg::fp().print(), std::to_string(offset)});
+        store_from_greg(allocaInst, Reg::t(1));
+    }
+    else
+    {
+        load_large_int32(offset, Reg::t(1));
+        append_inst("add.d", {Reg::t(1).print(), Reg::fp().print(), Reg::t(1).print()});
+        store_from_greg(allocaInst, Reg::t(1));
+    }
 }
 
 void CodeGen::gen_load()
@@ -432,7 +436,7 @@ void CodeGen::gen_load()
     else
     {
         // TODO load 整数类型的数据
-        if (type->is_int1_type()||type->is_int8_type())
+        if (type->is_int1_type() || type->is_int8_type())
         {
             append_inst("ld.b $t1, $t0, 0");
         }
@@ -574,7 +578,7 @@ void CodeGen::gen_call()
         {
             load_to_freg(arg, FReg::fa(i - 1));
         }
-        if (arg->get_type()->is_int32_type()||arg->get_type()->is_int8_type())
+        if (arg->get_type()->is_int32_type() || arg->get_type()->is_int8_type())
         {
             load_to_greg(arg, Reg::a(i - 1));
         }
@@ -601,47 +605,31 @@ void CodeGen::gen_call()
 
 void CodeGen::gen_gep()
 {
-    //%op5 = getelementptr [10 x i32], [10 x i32]* %op0, i32 0, i32 0
-    // TODO 计算内存地址
-    // 获取 gep 的第一个操作数
-
-    auto *ptr = context.inst->get_operand(0); // ptr 是op0
-    // 在for循环获取数组下标和每维大小，计算总偏移量
-    append_inst("addi.d $t0, $zero, 0");
-    for (int i = 1; i < context.inst->get_num_operand(); i++)
-    {
-        auto *index = context.inst->get_operand(i);
-        auto *type = ptr->get_type();
-        // offset乘这维大小
-        auto element_size = type->get_pointer_element_type()->get_size();
-
-        //append_inst("addi.d $t1, $zero, " + std::to_string(element_size));
-        load_large_int64(element_size, Reg::t(1));
-        append_inst("mul.d $t0, $t0, $t1");
-        // 加上偏移量
-        if (auto *constant = dynamic_cast<ConstantInt *>(index))
-        {
-            // offset += constant->get_value();
-            load_large_int64(constant->get_value(), Reg::t(1));
-            append_inst("addi.d $t2, $zero, 4");
-            append_inst("mul.d $t1, $t1, $t2");
-            append_inst("add.d $t0, $t0, $t1");
-        }
-
-        if (index->get_type()->is_int32_type() && index->get_name() != "")
-        {
-            load_to_greg(index, Reg::t(1));
-            append_inst("addi.d $t2, $zero, 4");
-            append_inst("mul.d $t1, $t1, $t2");
-            append_inst("add.d $t0, $t0, $t1");
-        }
+    auto gepInst = static_cast<GetElementPtrInst *>(context.inst);
+    auto base = gepInst->get_operand(0);
+    auto ptrType = static_cast<PointerType *>(base->get_type());
+    load_to_greg(base, Reg::t(0));                    // Base address
+    load_to_greg(gepInst->get_operand(1), Reg::t(1)); // First operand
+    if (ptrType->get_element_type()->is_array_type())
+    {                                                     // Array
+        load_to_greg(gepInst->get_operand(2), Reg::t(2)); // Second operand
+        load_large_int32(ptrType->get_element_type()->get_size(), Reg::t(3));
+        load_large_int32(ptrType->get_element_type()->get_array_element_type()->get_size(), Reg::t(4));
+        append_inst("mul.w $t1, $t1, $t3");
+        append_inst("bstrpick.d $t1, $t1, 31, 0");
+        append_inst("add.d $t0, $t0, $t1");
+        append_inst("mul.w $t2, $t2, $t4");
+        append_inst("bstrpick.d $t2, $t2, 31, 0");
+        append_inst("add.d $t0, $t0, $t2");
     }
-    // 把ptr放到寄存器
-    load_to_greg(ptr, Reg::t(1));
-    // 计算地址
-    append_inst("add.d $t0, $t0, $t1");
-    // 将计算得到的地址保存在栈帧上
-    store_from_greg(context.inst, Reg::t(0));
+    else
+    {
+        load_large_int32(ptrType->get_element_type()->get_size(), Reg::t(2));
+        append_inst("mul.w $t1, $t1, $t2");
+        append_inst("bstrpick.d $t1, $t1, 31, 0");
+        append_inst("add.d $t0, $t0, $t1");
+    }
+    store_from_greg(gepInst, Reg::t(0));
 }
 
 void CodeGen::gen_sitofp()
@@ -672,7 +660,6 @@ void CodeGen::gen_trunc()
     load_to_greg(context.inst->get_operand(0), Reg::t(0));
     append_inst("andi $t1, $t0, 255");
     store_from_greg(context.inst, Reg::t(1));
-
 }
 void CodeGen::run()
 {
@@ -703,23 +690,24 @@ void CodeGen::run()
             append_inst(".globl", {global.get_name()},
                         ASMInstruction::Atrribute);
             //.data 伪指令用于定义全局变量的初始值
-            if(global.get_init() ->print()!= "zeroinitializer")
-            append_inst(".data", ASMInstruction::Atrribute);
+            if (global.get_init()->print() != "zeroinitializer")
+                append_inst(".data", ASMInstruction::Atrribute);
             append_inst(".type", {global.get_name(), "@object"},
                         ASMInstruction::Atrribute);
             append_inst(".size", {global.get_name(), std::to_string(size)},
                         ASMInstruction::Atrribute);
             append_inst(global.get_name(), ASMInstruction::Label);
-            if(global.get_init() ->print()!= "zeroinitializer")
-            {    
-                std::string input = global.get_init() ->print();
+            if (global.get_init()->print() != "zeroinitializer")
+            {
+                std::string input = global.get_init()->print();
                 // 如果是数组,s = " [i32 1, i32 2, i32 3, i32 4, i32 5]"
-                //去掉[]和i32和空格,输出.long 1,.long 2,.long 3,.long 4,.long 5
-                if(input[1]=='[')
+                // 去掉[]和i32和空格,输出.long 1,.long 2,.long 3,.long 4,.long 5
+                if (input[1] == '[')
                 {
                     // 删除 "i32 " 部分
                     size_t pos = input.find("i32 ");
-                    while (pos != std::string::npos) {
+                    while (pos != std::string::npos)
+                    {
                         input.erase(pos, 4); // 4 是 "i32 " 的长度
                         pos = input.find("i32 ");
                     }
@@ -734,14 +722,15 @@ void CodeGen::run()
                     // 使用 stringstream 逐个解析数字
                     std::stringstream ss(input);
                     std::string token;
-                    while (std::getline(ss, token, ',')) {
+                    while (std::getline(ss, token, ','))
+                    {
                         int number = std::stoi(token);
                         append_inst(".long", {std::to_string(number)}, ASMInstruction::Atrribute);
                     }
                 }
                 else
                 {
-                    append_inst(".word",{global.get_init()->print()},ASMInstruction::Atrribute);
+                    append_inst(".word", {global.get_init()->print()}, ASMInstruction::Atrribute);
                 }
             }
             append_inst(".space", {std::to_string(size)},
@@ -757,7 +746,7 @@ void CodeGen::run()
     std::vector<std::pair<Value *, std::pair<Value *, Value *>>> phi_vector;
     for (auto &func : m->get_functions())
     {
-        
+
         for (auto &bb : func.get_basic_blocks())
         {
             for (auto &instr : bb.get_instructions())
@@ -820,7 +809,7 @@ void CodeGen::run()
                         // phi_pair里面每项是op_name, label_name
                         // 如果label_name是当前基本块的名字，就把op_name的值赋给phi_name
 
-                       for (auto &phi : phi_vector)
+                        for (auto &phi : phi_vector)
                         {
                             if (phi.first == &bb)
                             {
@@ -830,7 +819,7 @@ void CodeGen::run()
                                 store_from_greg(phi_name, Reg::t(0));
                             }
                         }
-                 
+
                         gen_br();
 
                         break;

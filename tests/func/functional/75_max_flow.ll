@@ -173,7 +173,7 @@ label13:                                                ; preds = %label_entry
   %op17 = alloca i32 
   store i32  0, i32 * %op17
   br label %label18
-label18:                                                ; preds = %label13, %label138
+label18:                                                ; preds = %label13, %label42, %label54, %label138
   %op19 = load i32 , i32 * %op17
   %op20 = load i32 , i32 * %op3
   %op21 = load i32 , i32 * %op3
@@ -204,8 +204,8 @@ label42:                                                ; preds = %label27
   %op43 = load i32 , i32 * %op17
   %op44 = add i32  %op43, 1
   store i32  %op44, i32 * %op17
-  br label %label45
-label45:                                                ; preds = %label27, %label42
+  br label %label18
+label45:                                                ; preds = %label27
   %op46 = load i32 , i32 * %op3
   %op47 = load i32 , i32 * %op3
   %op48 = load i32 , i32 * %op17
@@ -219,8 +219,8 @@ label54:                                                ; preds = %label45
   %op55 = load i32 , i32 * %op17
   %op56 = add i32  %op55, 1
   store i32  %op56, i32 * %op17
-  br label %label57
-label57:                                                ; preds = %label45, %label54
+  br label %label18
+label57:                                                ; preds = %label45
   %op58 = alloca i32 
   %op59 = load i32 , i32 * %op5
   %op60 = load i32 , i32 * %op3

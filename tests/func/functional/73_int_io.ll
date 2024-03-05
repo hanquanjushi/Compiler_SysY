@@ -30,7 +30,7 @@ label_entry:
   store i32  0, i32 * %op0
   %op1 = alloca i32 
   br label %label2
-label2:                                                ; preds = %label_entry, %label17
+label2:                                                ; preds = %label_entry, %label15
   %op3 = icmp ne i32  1, 0
   br i1  %op3, label %label4, label %label13
 label4:                                                ; preds = %label2
@@ -43,57 +43,55 @@ label4:                                                ; preds = %label2
   %op10 = icmp slt i32  %op9, 0
   %op11 = zext i1  %op10 to i32 
   %op12 = icmp ne i32  %op11, 0
-  br i1  %op12, label %label15, label %label18
+  br i1  %op12, label %label15, label %label17
 label13:                                                ; preds = %label2, %label16
   %op14 = load i32 , i32 * %op1
   store i32  %op14, i32 * %op0
-  br label %label23
-label15:                                                ; preds = %label4, %label18
-  br label %label17
-label16:                                                ; preds = %label18
-  br label %label13
-label17:                                                ; preds = %label15
+  br label %label22
+label15:                                                ; preds = %label4, %label17
   br label %label2
-label18:                                                ; preds = %label4
-  %op19 = load i32 , i32 * %op1
-  %op20 = icmp sgt i32  %op19, 9
-  %op21 = zext i1  %op20 to i32 
-  %op22 = icmp ne i32  %op21, 0
-  br i1  %op22, label %label15, label %label16
-label23:                                                ; preds = %label13, %label42
-  %op24 = icmp ne i32  1, 0
-  br i1  %op24, label %label25, label %label34
-label25:                                                ; preds = %label23
-  %op26 = call i8  @getch()
-  %op27 = load i32 , i32 * @ascii_0
-  %op28 = zext i8  %op26 to i32 
-  %op29 = sub i32  %op28, %op27
-  store i32  %op29, i32 * %op1
-  %op30 = load i32 , i32 * %op1
-  %op31 = icmp sge i32  %op30, 0
-  %op32 = zext i1  %op31 to i32 
-  %op33 = icmp ne i32  %op32, 0
-  br i1  %op33, label %label43, label %label41
-label34:                                                ; preds = %label23, %label41
-  %op35 = load i32 , i32 * %op0
-  ret i32  %op35
-label36:                                                ; preds = %label43
-  %op37 = load i32 , i32 * %op0
-  %op38 = mul i32  %op37, 10
-  %op39 = load i32 , i32 * %op1
-  %op40 = add i32  %op38, %op39
-  store i32  %op40, i32 * %op0
-  br label %label42
-label41:                                                ; preds = %label25, %label43
-  br label %label34
-label42:                                                ; preds = %label36
-  br label %label23
-label43:                                                ; preds = %label25
-  %op44 = load i32 , i32 * %op1
-  %op45 = icmp sle i32  %op44, 9
-  %op46 = zext i1  %op45 to i32 
-  %op47 = icmp ne i32  %op46, 0
-  br i1  %op47, label %label36, label %label41
+label16:                                                ; preds = %label17
+  br label %label13
+label17:                                                ; preds = %label4
+  %op18 = load i32 , i32 * %op1
+  %op19 = icmp sgt i32  %op18, 9
+  %op20 = zext i1  %op19 to i32 
+  %op21 = icmp ne i32  %op20, 0
+  br i1  %op21, label %label15, label %label16
+label22:                                                ; preds = %label13, %label41
+  %op23 = icmp ne i32  1, 0
+  br i1  %op23, label %label24, label %label33
+label24:                                                ; preds = %label22
+  %op25 = call i8  @getch()
+  %op26 = load i32 , i32 * @ascii_0
+  %op27 = zext i8  %op25 to i32 
+  %op28 = sub i32  %op27, %op26
+  store i32  %op28, i32 * %op1
+  %op29 = load i32 , i32 * %op1
+  %op30 = icmp sge i32  %op29, 0
+  %op31 = zext i1  %op30 to i32 
+  %op32 = icmp ne i32  %op31, 0
+  br i1  %op32, label %label42, label %label40
+label33:                                                ; preds = %label22, %label40
+  %op34 = load i32 , i32 * %op0
+  ret i32  %op34
+label35:                                                ; preds = %label42
+  %op36 = load i32 , i32 * %op0
+  %op37 = mul i32  %op36, 10
+  %op38 = load i32 , i32 * %op1
+  %op39 = add i32  %op37, %op38
+  store i32  %op39, i32 * %op0
+  br label %label41
+label40:                                                ; preds = %label24, %label42
+  br label %label33
+label41:                                                ; preds = %label35
+  br label %label22
+label42:                                                ; preds = %label24
+  %op43 = load i32 , i32 * %op1
+  %op44 = icmp sle i32  %op43, 9
+  %op45 = zext i1  %op44 to i32 
+  %op46 = icmp ne i32  %op45, 0
+  br i1  %op46, label %label35, label %label40
 }
 define void @my_putint(i32  %arg0) {
 label_entry:
