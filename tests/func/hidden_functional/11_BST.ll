@@ -1,5 +1,5 @@
 ; ModuleID = 'cminus'
-source_filename = "/home/waang/cowork/tests/func/hidden_functional/11_BST.sy"
+source_filename = "/home/hq/SysY/tests/func/hidden_functional/11_BST.sy"
 
 @space = constant i32  32
 @LF = constant i32  10
