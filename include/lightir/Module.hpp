@@ -31,6 +31,8 @@ class Module {
 
     PointerType *get_pointer_type(Type *contained);
     ArrayType *get_array_type(Type *contained, unsigned num_elements);
+    MultiArrayType *get_multi_array_type(Type *contained,
+                                         std::vector<unsigned> num_elements);
     FunctionType *get_function_type(Type *retty, std::vector<Type *> &args);
 
     void add_function(Function *f);
@@ -55,6 +57,8 @@ class Module {
     std::unique_ptr<FloatType> float32_ty_;
     std::map<Type *, std::unique_ptr<PointerType>> pointer_map_;
     std::map<std::pair<Type *, int>, std::unique_ptr<ArrayType>> array_map_;
+    std::map<std::pair<Type *, std::vector<int>>, std::unique_ptr<MultiArrayType>>
+        multi_array_map_;
     std::map<std::pair<Type *, std::vector<Type *>>,
              std::unique_ptr<FunctionType>>
         function_map_;

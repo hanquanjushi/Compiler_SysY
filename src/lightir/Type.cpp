@@ -121,6 +121,22 @@ std::string Type::print() const
             static_cast<const ArrayType *>(this)->get_element_type()->print();
         type_ir += "]";
         break;
+    case MultiArrayTyID:
+        type_ir += "[";
+        for (unsigned i = 0;
+             i < static_cast<const MultiArrayType *>(this)->get_num_of_elements().size();
+             i++)
+        {
+            if (i)
+                type_ir += " x ";
+            type_ir += std::to_string(
+                static_cast<const MultiArrayType *>(this)->get_num_of_elements()[i]);
+        }
+        type_ir += " x ";
+        type_ir +=
+            static_cast<const MultiArrayType *>(this)->get_element_type()->print();
+        type_ir += "]";
+        break;
     case FloatTyID:
         type_ir += "float";
         break;
@@ -179,15 +195,31 @@ ArrayType::ArrayType(Type *contained, unsigned num_elements)
            "Not a valid type for array element!");
     contained_ = contained;
 }
+MultiArrayType::MultiArrayType(Type *contained, std::vector<unsigned> num_elements)
+    : Type(Type::MultiArrayTyID, contained->get_module()),
+      num_elements_(num_elements)
+{
+    assert(is_valid_element_type(contained) &&
+           "Not a valid type for array element!");
+    contained_ = contained;
+}
 
 bool ArrayType::is_valid_element_type(Type *ty)
 {
     return ty->is_integer_type() || ty->is_array_type() || ty->is_float_type();
 }
 
+bool MultiArrayType::is_valid_element_type(Type *ty)
+{
+    return ty->is_integer_type() || ty->is_multi_array_type() || ty->is_float_type();
+}
 ArrayType *ArrayType::get(Type *contained, unsigned num_elements)
 {
     return contained->get_module()->get_array_type(contained, num_elements);
+}
+MultiArrayType *MultiArrayType::get(Type *contained, std::vector<unsigned> num_elements)
+{
+    return contained->get_module()->get_multi_array_type(contained, num_elements);
 }
 
 PointerType::PointerType(Type *contained)

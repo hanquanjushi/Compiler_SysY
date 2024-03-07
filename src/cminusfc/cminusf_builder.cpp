@@ -722,8 +722,8 @@ Value *CminusfBuilder::visit(ASTVarDef &node)
             }
             else
             {
-                // auto array_type = ArrayType::get(var_type, const_array.size());
-                // auto *var = builder->create_alloca(array_type);
+                 //创建一个多维数组
+                auto multiarray= MultiArrayType::get(var_type, array_size);
                 auto array_type = ArrayType::get(var_type, const_array.size());
                 auto *var = builder->create_alloca(array_type);
                 scope.push(node.id, var);

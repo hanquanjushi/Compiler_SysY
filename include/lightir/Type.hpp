@@ -18,6 +18,7 @@ class Type {
         IntegerTyID,  // Integers, include 32 bits and 1 bit
         FunctionTyID, // Functions
         ArrayTyID,    // Arrays
+        MultiArrayTyID, // Multi-dimension Arrays
         PointerTyID,  // Pointer
         FloatTyID     // float
     };
@@ -32,6 +33,7 @@ class Type {
     bool is_integer_type() const { return get_type_id() == IntegerTyID; }
     bool is_function_type() const { return get_type_id() == FunctionTyID; }
     bool is_array_type() const { return get_type_id() == ArrayTyID; }
+    bool is_multi_array_type() const { return get_type_id() == MultiArrayTyID; }
     bool is_pointer_type() const { return get_type_id() == PointerTyID; }
     bool is_float_type() const { return get_type_id() == FloatTyID; }
     bool is_int32_type() const;
@@ -97,6 +99,23 @@ class ArrayType : public Type {
   private:
     Type *contained_;       // The element type of the array.
     unsigned num_elements_; // Number of elements in the array.
+};
+
+//多维数组
+class MultiArrayType : public Type {
+  public:
+    MultiArrayType(Type *contained, std::vector<unsigned> num_elements);
+
+    static bool is_valid_element_type(Type *ty);
+
+    static MultiArrayType *get(Type *contained, std::vector<unsigned> num_elements);
+
+    Type *get_element_type() const { return contained_; }
+    std::vector<unsigned> get_num_of_elements() const { return num_elements_; }
+
+  private:
+    Type *contained_;       // The element type of the array.
+    std::vector<unsigned> num_elements_; // Number of elements in the array.
 };
 
 class PointerType : public Type {

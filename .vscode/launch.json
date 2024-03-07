@@ -11,7 +11,7 @@
             "program":   "${workspaceFolder}/build/cminusfc",
             "args": [
                 "-S",
-                "${workspaceFolder}/tests/3-codegen/autogen/testcases/functional/79_var_name.sy"
+                "${workspaceFolder}/tests/func/functional/04_arr_defn3.sy"
 
             ],
             "stopAtEntry": false,

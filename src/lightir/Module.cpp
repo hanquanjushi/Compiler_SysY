@@ -5,7 +5,8 @@
 #include <memory>
 #include <string>
 
-Module::Module() {
+Module::Module()
+{
     void_ty_ = std::make_unique<Type>(Type::VoidTyID, this);
     label_ty_ = std::make_unique<Type>(Type::LabelTyID, this);
     int1_ty_ = std::make_unique<IntegerType>(1, this);
@@ -21,31 +22,51 @@ IntegerType *Module::get_int8_type() { return int8_ty_.get(); }
 IntegerType *Module::get_int32_type() { return int32_ty_.get(); }
 
 FloatType *Module::get_float_type() { return float32_ty_.get(); }
-PointerType *Module::get_int32_ptr_type() {
+PointerType *Module::get_int32_ptr_type()
+{
     return get_pointer_type(int32_ty_.get());
 }
-PointerType *Module::get_float_ptr_type() {
+PointerType *Module::get_float_ptr_type()
+{
     return get_pointer_type(float32_ty_.get());
 }
 
-PointerType *Module::get_pointer_type(Type *contained) {
-    if (pointer_map_.find(contained) == pointer_map_.end()) {
+PointerType *Module::get_pointer_type(Type *contained)
+{
+    if (pointer_map_.find(contained) == pointer_map_.end())
+    {
         pointer_map_[contained] = std::make_unique<PointerType>(contained);
     }
     return pointer_map_[contained].get();
 }
 
-ArrayType *Module::get_array_type(Type *contained, unsigned num_elements) {
-    if (array_map_.find({contained, num_elements}) == array_map_.end()) {
+ArrayType *Module::get_array_type(Type *contained, unsigned num_elements)
+{
+    if (array_map_.find({contained, num_elements}) == array_map_.end())
+    {
         array_map_[{contained, num_elements}] =
             std::make_unique<ArrayType>(contained, num_elements);
     }
     return array_map_[{contained, num_elements}].get();
 }
+MultiArrayType *Module::get_multi_array_type(Type *contained,
+                                             std::vector<unsigned> num_elements)
+{
+    auto key = std::make_pair(contained, num_elements); // Create a key using std::make_pair
+
+    if (multi_array_map_.find(key) == multi_array_map_.end())
+    {
+        multi_array_map_[key] = std::make_unique<MultiArrayType>(contained, num_elements);
+    }
+
+    return multi_array_map_[key].get();
+}
 
 FunctionType *Module::get_function_type(Type *retty,
-                                        std::vector<Type *> &args) {
-    if (not function_map_.count({retty, args})) {
+                                        std::vector<Type *> &args)
+{
+    if (not function_map_.count({retty, args}))
+    {
         function_map_[{retty, args}] =
             std::make_unique<FunctionType>(retty, args);
     }
@@ -54,28 +75,35 @@ FunctionType *Module::get_function_type(Type *retty,
 
 void Module::add_function(Function *f) { function_list_.push_back(f); }
 llvm::ilist<Function> &Module::get_functions() { return function_list_; }
-void Module::add_global_variable(GlobalVariable *g) {
+void Module::add_global_variable(GlobalVariable *g)
+{
     global_list_.push_back(g);
 }
-llvm::ilist<GlobalVariable> &Module::get_global_variable() {
+llvm::ilist<GlobalVariable> &Module::get_global_variable()
+{
     return global_list_;
 }
 
-void Module::set_print_name() {
-    for (auto &func : this->get_functions()) {
+void Module::set_print_name()
+{
+    for (auto &func : this->get_functions())
+    {
         func.set_instr_name();
     }
     return;
 }
 
-std::string Module::print() {
+std::string Module::print()
+{
     set_print_name();
     std::string module_ir;
-    for (auto &global_val : this->global_list_) {
+    for (auto &global_val : this->global_list_)
+    {
         module_ir += global_val.print();
         module_ir += "\n";
     }
-    for (auto &func : this->function_list_) {
+    for (auto &func : this->function_list_)
+    {
         module_ir += func.print();
         module_ir += "\n";
     }
